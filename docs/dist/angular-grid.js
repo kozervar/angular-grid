@@ -177,12 +177,14 @@ var awk;
             //Returns true if it is a DOM node
             //taken from: http://stackoverflow.com/questions/384286/javascript-isdom-how-do-you-check-if-a-javascript-object-is-a-dom-object
             Utils.isNode = function (o) {
-                return (typeof Node === "object" ? o instanceof Node : o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName === "string");
+                return (typeof Node === "object" ? o instanceof Node :
+                    o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName === "string");
             };
             //Returns true if it is a DOM element
             //taken from: http://stackoverflow.com/questions/384286/javascript-isdom-how-do-you-check-if-a-javascript-object-is-a-dom-object
             Utils.isElement = function (o) {
-                return (typeof HTMLElement === "object" ? o instanceof HTMLElement : o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName === "string");
+                return (typeof HTMLElement === "object" ? o instanceof HTMLElement :
+                    o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName === "string");
             };
             Utils.isNodeOrElement = function (o) {
                 return this.isNode(o) || this.isElement(o);
@@ -289,7 +291,9 @@ var awk;
                 }
             };
             Utils.removeFromArray = function (array, object) {
-                array.splice(array.indexOf(object), 1);
+                if (array.indexOf(object) >= 0) {
+                    array.splice(array.indexOf(object), 1);
+                }
             };
             Utils.defaultComparator = function (valueA, valueB) {
                 var valueAMissing = valueA === null || valueA === undefined;
@@ -451,11 +455,15 @@ var awk;
             Constants.MAX = 'max';
             Constants.KEY_TAB = 9;
             Constants.KEY_ENTER = 13;
+            Constants.KEY_ESCAPE = 27;
             Constants.KEY_SPACE = 32;
             Constants.KEY_DOWN = 40;
             Constants.KEY_UP = 38;
             Constants.KEY_LEFT = 37;
             Constants.KEY_RIGHT = 39;
+            Constants.KEY_F2 = 113;
+            Constants.KEY_END = 35;
+            Constants.KEY_HOME = 36;
             return Constants;
         })();
         grid.Constants = Constants;
@@ -574,6 +582,7 @@ var awk;
                     this.displayedColumns = this.allColumns;
                     return;
                 }
+                // and calculate again
                 for (var i = 0, j = this.allColumns.length; i < j; i++) {
                     var column = this.allColumns[i];
                     switch (column.colDef.headerGroupShow) {
@@ -624,225 +633,79 @@ var awk;
                 this.setupDefaults();
                 this.checkForDeprecated();
             }
-            GridOptionsWrapper.prototype.isRowSelection = function () {
-                return this.gridOptions.rowSelection === "single" || this.gridOptions.rowSelection === "multiple";
-            };
-            GridOptionsWrapper.prototype.isRowDeselection = function () {
-                return isTrue(this.gridOptions.rowDeselection);
-            };
-            GridOptionsWrapper.prototype.isRowSelectionMulti = function () {
-                return this.gridOptions.rowSelection === 'multiple';
-            };
-            GridOptionsWrapper.prototype.getContext = function () {
-                return this.gridOptions.context;
-            };
-            GridOptionsWrapper.prototype.isVirtualPaging = function () {
-                return isTrue(this.gridOptions.virtualPaging);
-            };
-            GridOptionsWrapper.prototype.isShowToolPanel = function () {
-                return isTrue(this.gridOptions.showToolPanel);
-            };
-            GridOptionsWrapper.prototype.isToolPanelSuppressPivot = function () {
-                return isTrue(this.gridOptions.toolPanelSuppressPivot);
-            };
-            GridOptionsWrapper.prototype.isToolPanelSuppressValues = function () {
-                return isTrue(this.gridOptions.toolPanelSuppressValues);
-            };
-            GridOptionsWrapper.prototype.isRowsAlreadyGrouped = function () {
-                return isTrue(this.gridOptions.rowsAlreadyGrouped);
-            };
-            GridOptionsWrapper.prototype.isGroupSelectsChildren = function () {
-                return isTrue(this.gridOptions.groupSelectsChildren);
-            };
-            GridOptionsWrapper.prototype.isGroupHidePivotColumns = function () {
-                return isTrue(this.gridOptions.groupHidePivotColumns);
-            };
-            GridOptionsWrapper.prototype.isGroupIncludeFooter = function () {
-                return isTrue(this.gridOptions.groupIncludeFooter);
-            };
-            GridOptionsWrapper.prototype.isGroupSuppressBlankHeader = function () {
-                return isTrue(this.gridOptions.groupSuppressBlankHeader);
-            };
-            GridOptionsWrapper.prototype.isSuppressRowClickSelection = function () {
-                return isTrue(this.gridOptions.suppressRowClickSelection);
-            };
-            GridOptionsWrapper.prototype.isSuppressCellSelection = function () {
-                return isTrue(this.gridOptions.suppressCellSelection);
-            };
-            GridOptionsWrapper.prototype.isSuppressMultiSort = function () {
-                return isTrue(this.gridOptions.suppressMultiSort);
-            };
-            GridOptionsWrapper.prototype.isGroupSuppressAutoColumn = function () {
-                return isTrue(this.gridOptions.groupSuppressAutoColumn);
-            };
-            GridOptionsWrapper.prototype.isGroupHeaders = function () {
-                return isTrue(this.gridOptions.groupHeaders);
-            };
-            GridOptionsWrapper.prototype.isDontUseScrolls = function () {
-                return isTrue(this.gridOptions.dontUseScrolls);
-            };
-            GridOptionsWrapper.prototype.isSuppressHorizontalScroll = function () {
-                return isTrue(this.gridOptions.suppressHorizontalScroll);
-            };
-            GridOptionsWrapper.prototype.isUnSortIcon = function () {
-                return isTrue(this.gridOptions.unSortIcon);
-            };
-            GridOptionsWrapper.prototype.isSuppressMenuHide = function () {
-                return isTrue(this.gridOptions.suppressMenuHide);
-            };
-            GridOptionsWrapper.prototype.getRowStyle = function () {
-                return this.gridOptions.rowStyle;
-            };
-            GridOptionsWrapper.prototype.getRowClass = function () {
-                return this.gridOptions.rowClass;
-            };
-            GridOptionsWrapper.prototype.getHeaderCellRenderer = function () {
-                return this.gridOptions.headerCellRenderer;
-            };
-            GridOptionsWrapper.prototype.getApi = function () {
-                return this.gridOptions.api;
-            };
-            GridOptionsWrapper.prototype.isEnableColResize = function () {
-                return isTrue(this.gridOptions.enableColResize);
-            };
-            GridOptionsWrapper.prototype.getGroupDefaultExpanded = function () {
-                return this.gridOptions.groupDefaultExpanded;
-            };
-            GridOptionsWrapper.prototype.getGroupKeys = function () {
-                return this.gridOptions.groupKeys;
-            };
-            GridOptionsWrapper.prototype.getGroupAggFunction = function () {
-                return this.gridOptions.groupAggFunction;
-            };
-            GridOptionsWrapper.prototype.getGroupAggFields = function () {
-                return this.gridOptions.groupAggFields;
-            };
-            GridOptionsWrapper.prototype.getAllRows = function () {
-                return this.gridOptions.rowData;
-            };
-            GridOptionsWrapper.prototype.isGroupUseEntireRow = function () {
-                return isTrue(this.gridOptions.groupUseEntireRow);
-            };
-            GridOptionsWrapper.prototype.getGroupColumnDef = function () {
-                return this.gridOptions.groupColumnDef;
-            };
-            GridOptionsWrapper.prototype.isGroupSuppressRow = function () {
-                return isTrue(this.gridOptions.groupSuppressRow);
-            };
-            GridOptionsWrapper.prototype.isAngularCompileRows = function () {
-                return isTrue(this.gridOptions.angularCompileRows);
-            };
-            GridOptionsWrapper.prototype.isAngularCompileFilters = function () {
-                return isTrue(this.gridOptions.angularCompileFilters);
-            };
-            GridOptionsWrapper.prototype.isAngularCompileHeaders = function () {
-                return isTrue(this.gridOptions.angularCompileHeaders);
-            };
-            GridOptionsWrapper.prototype.isDebug = function () {
-                return isTrue(this.gridOptions.debug);
-            };
-            GridOptionsWrapper.prototype.getColumnDefs = function () {
-                return this.gridOptions.columnDefs;
-            };
-            GridOptionsWrapper.prototype.getRowHeight = function () {
-                return this.gridOptions.rowHeight;
-            };
-            GridOptionsWrapper.prototype.getBeforeFilterChanged = function () {
-                return this.gridOptions.beforeFilterChanged;
-            };
-            GridOptionsWrapper.prototype.getAfterFilterChanged = function () {
-                return this.gridOptions.afterFilterChanged;
-            };
-            GridOptionsWrapper.prototype.getFilterModified = function () {
-                return this.gridOptions.filterModified;
-            };
-            GridOptionsWrapper.prototype.getBeforeSortChanged = function () {
-                return this.gridOptions.beforeSortChanged;
-            };
-            GridOptionsWrapper.prototype.getAfterSortChanged = function () {
-                return this.gridOptions.afterSortChanged;
-            };
-            GridOptionsWrapper.prototype.getModelUpdated = function () {
-                return this.gridOptions.modelUpdated;
-            };
-            GridOptionsWrapper.prototype.getCellClicked = function () {
-                return this.gridOptions.cellClicked;
-            };
-            GridOptionsWrapper.prototype.getCellDoubleClicked = function () {
-                return this.gridOptions.cellDoubleClicked;
-            };
-            GridOptionsWrapper.prototype.getCellValueChanged = function () {
-                return this.gridOptions.cellValueChanged;
-            };
-            GridOptionsWrapper.prototype.getCellFocused = function () {
-                return this.gridOptions.cellFocused;
-            };
-            GridOptionsWrapper.prototype.getRowSelected = function () {
-                return this.gridOptions.rowSelected;
-            };
-            GridOptionsWrapper.prototype.getColumnResized = function () {
-                return this.gridOptions.columnResized;
-            };
-            GridOptionsWrapper.prototype.getColumnVisibilityChanged = function () {
-                return this.gridOptions.columnVisibilityChanged;
-            };
-            GridOptionsWrapper.prototype.getColumnOrderChanged = function () {
-                return this.gridOptions.columnOrderChanged;
-            };
-            GridOptionsWrapper.prototype.getSelectionChanged = function () {
-                return this.gridOptions.selectionChanged;
-            };
-            GridOptionsWrapper.prototype.getVirtualRowRemoved = function () {
-                return this.gridOptions.virtualRowRemoved;
-            };
-            GridOptionsWrapper.prototype.getDatasource = function () {
-                return this.gridOptions.datasource;
-            };
-            GridOptionsWrapper.prototype.getReady = function () {
-                return this.gridOptions.ready;
-            };
-            GridOptionsWrapper.prototype.getRowBuffer = function () {
-                return this.gridOptions.rowBuffer;
-            };
-            GridOptionsWrapper.prototype.isEnableSorting = function () {
-                return isTrue(this.gridOptions.enableSorting) || isTrue(this.gridOptions.enableServerSideSorting);
-            };
-            GridOptionsWrapper.prototype.isEnableCellExpressions = function () {
-                return isTrue(this.gridOptions.enableCellExpressions);
-            };
-            GridOptionsWrapper.prototype.isEnableServerSideSorting = function () {
-                return isTrue(this.gridOptions.enableServerSideSorting);
-            };
-            GridOptionsWrapper.prototype.isEnableFilter = function () {
-                return isTrue(this.gridOptions.enableFilter) || isTrue(this.gridOptions.enableServerSideFilter);
-            };
-            GridOptionsWrapper.prototype.isEnableServerSideFilter = function () {
-                return this.gridOptions.enableServerSideFilter;
-            };
-            GridOptionsWrapper.prototype.isSuppressScrollLag = function () {
-                return isTrue(this.gridOptions.suppressScrollLag);
-            };
-            GridOptionsWrapper.prototype.setSelectedRows = function (newSelectedRows) {
-                return this.gridOptions.selectedRows = newSelectedRows;
-            };
-            GridOptionsWrapper.prototype.setSelectedNodesById = function (newSelectedNodes) {
-                return this.gridOptions.selectedNodesById = newSelectedNodes;
-            };
-            GridOptionsWrapper.prototype.getIcons = function () {
-                return this.gridOptions.icons;
-            };
-            GridOptionsWrapper.prototype.getIsScrollLag = function () {
-                return this.gridOptions.isScrollLag;
-            };
-            GridOptionsWrapper.prototype.getSortingOrder = function () {
-                return this.gridOptions.sortingOrder;
-            };
-            GridOptionsWrapper.prototype.getSlaveGrids = function () {
-                return this.gridOptions.slaveGrids;
-            };
-            GridOptionsWrapper.prototype.getGroupRowRenderer = function () {
-                return this.gridOptions.groupRowRenderer;
-            };
+            GridOptionsWrapper.prototype.isRowSelection = function () { return this.gridOptions.rowSelection === "single" || this.gridOptions.rowSelection === "multiple"; };
+            GridOptionsWrapper.prototype.isRowDeselection = function () { return isTrue(this.gridOptions.rowDeselection); };
+            GridOptionsWrapper.prototype.isRowSelectionMulti = function () { return this.gridOptions.rowSelection === 'multiple'; };
+            GridOptionsWrapper.prototype.getContext = function () { return this.gridOptions.context; };
+            GridOptionsWrapper.prototype.isVirtualPaging = function () { return isTrue(this.gridOptions.virtualPaging); };
+            GridOptionsWrapper.prototype.isShowToolPanel = function () { return isTrue(this.gridOptions.showToolPanel); };
+            GridOptionsWrapper.prototype.isToolPanelSuppressPivot = function () { return isTrue(this.gridOptions.toolPanelSuppressPivot); };
+            GridOptionsWrapper.prototype.isToolPanelSuppressValues = function () { return isTrue(this.gridOptions.toolPanelSuppressValues); };
+            GridOptionsWrapper.prototype.isRowsAlreadyGrouped = function () { return isTrue(this.gridOptions.rowsAlreadyGrouped); };
+            GridOptionsWrapper.prototype.isGroupSelectsChildren = function () { return isTrue(this.gridOptions.groupSelectsChildren); };
+            GridOptionsWrapper.prototype.isGroupHidePivotColumns = function () { return isTrue(this.gridOptions.groupHidePivotColumns); };
+            GridOptionsWrapper.prototype.isGroupIncludeFooter = function () { return isTrue(this.gridOptions.groupIncludeFooter); };
+            GridOptionsWrapper.prototype.isGroupSuppressBlankHeader = function () { return isTrue(this.gridOptions.groupSuppressBlankHeader); };
+            GridOptionsWrapper.prototype.isSuppressRowClickSelection = function () { return isTrue(this.gridOptions.suppressRowClickSelection); };
+            GridOptionsWrapper.prototype.isSuppressCellSelection = function () { return isTrue(this.gridOptions.suppressCellSelection); };
+            GridOptionsWrapper.prototype.isSuppressMultiSort = function () { return isTrue(this.gridOptions.suppressMultiSort); };
+            GridOptionsWrapper.prototype.isGroupSuppressAutoColumn = function () { return isTrue(this.gridOptions.groupSuppressAutoColumn); };
+            GridOptionsWrapper.prototype.isGroupHeaders = function () { return isTrue(this.gridOptions.groupHeaders); };
+            GridOptionsWrapper.prototype.isDontUseScrolls = function () { return isTrue(this.gridOptions.dontUseScrolls); };
+            GridOptionsWrapper.prototype.isSuppressHorizontalScroll = function () { return isTrue(this.gridOptions.suppressHorizontalScroll); };
+            GridOptionsWrapper.prototype.isUnSortIcon = function () { return isTrue(this.gridOptions.unSortIcon); };
+            GridOptionsWrapper.prototype.isSuppressMenuHide = function () { return isTrue(this.gridOptions.suppressMenuHide); };
+            GridOptionsWrapper.prototype.getRowStyle = function () { return this.gridOptions.rowStyle; };
+            GridOptionsWrapper.prototype.getRowClass = function () { return this.gridOptions.rowClass; };
+            GridOptionsWrapper.prototype.getHeaderCellRenderer = function () { return this.gridOptions.headerCellRenderer; };
+            GridOptionsWrapper.prototype.getApi = function () { return this.gridOptions.api; };
+            GridOptionsWrapper.prototype.isEnableColResize = function () { return isTrue(this.gridOptions.enableColResize); };
+            GridOptionsWrapper.prototype.getGroupDefaultExpanded = function () { return this.gridOptions.groupDefaultExpanded; };
+            GridOptionsWrapper.prototype.getGroupKeys = function () { return this.gridOptions.groupKeys; };
+            GridOptionsWrapper.prototype.getGroupAggFunction = function () { return this.gridOptions.groupAggFunction; };
+            GridOptionsWrapper.prototype.getGroupAggFields = function () { return this.gridOptions.groupAggFields; };
+            GridOptionsWrapper.prototype.getAllRows = function () { return this.gridOptions.rowData; };
+            GridOptionsWrapper.prototype.isGroupUseEntireRow = function () { return isTrue(this.gridOptions.groupUseEntireRow); };
+            GridOptionsWrapper.prototype.getGroupColumnDef = function () { return this.gridOptions.groupColumnDef; };
+            GridOptionsWrapper.prototype.isGroupSuppressRow = function () { return isTrue(this.gridOptions.groupSuppressRow); };
+            GridOptionsWrapper.prototype.isAngularCompileRows = function () { return isTrue(this.gridOptions.angularCompileRows); };
+            GridOptionsWrapper.prototype.isAngularCompileFilters = function () { return isTrue(this.gridOptions.angularCompileFilters); };
+            GridOptionsWrapper.prototype.isAngularCompileHeaders = function () { return isTrue(this.gridOptions.angularCompileHeaders); };
+            GridOptionsWrapper.prototype.isDebug = function () { return isTrue(this.gridOptions.debug); };
+            GridOptionsWrapper.prototype.getColumnDefs = function () { return this.gridOptions.columnDefs; };
+            GridOptionsWrapper.prototype.getRowHeight = function () { return this.gridOptions.rowHeight; };
+            GridOptionsWrapper.prototype.getBeforeFilterChanged = function () { return this.gridOptions.beforeFilterChanged; };
+            GridOptionsWrapper.prototype.getAfterFilterChanged = function () { return this.gridOptions.afterFilterChanged; };
+            GridOptionsWrapper.prototype.getFilterModified = function () { return this.gridOptions.filterModified; };
+            GridOptionsWrapper.prototype.getBeforeSortChanged = function () { return this.gridOptions.beforeSortChanged; };
+            GridOptionsWrapper.prototype.getAfterSortChanged = function () { return this.gridOptions.afterSortChanged; };
+            GridOptionsWrapper.prototype.getModelUpdated = function () { return this.gridOptions.modelUpdated; };
+            GridOptionsWrapper.prototype.getCellClicked = function () { return this.gridOptions.cellClicked; };
+            GridOptionsWrapper.prototype.getCellDoubleClicked = function () { return this.gridOptions.cellDoubleClicked; };
+            GridOptionsWrapper.prototype.getCellValueChanged = function () { return this.gridOptions.cellValueChanged; };
+            GridOptionsWrapper.prototype.getCellFocused = function () { return this.gridOptions.cellFocused; };
+            GridOptionsWrapper.prototype.getRowSelected = function () { return this.gridOptions.rowSelected; };
+            GridOptionsWrapper.prototype.getColumnResized = function () { return this.gridOptions.columnResized; };
+            GridOptionsWrapper.prototype.getColumnVisibilityChanged = function () { return this.gridOptions.columnVisibilityChanged; };
+            GridOptionsWrapper.prototype.getColumnOrderChanged = function () { return this.gridOptions.columnOrderChanged; };
+            GridOptionsWrapper.prototype.getSelectionChanged = function () { return this.gridOptions.selectionChanged; };
+            GridOptionsWrapper.prototype.getVirtualRowRemoved = function () { return this.gridOptions.virtualRowRemoved; };
+            GridOptionsWrapper.prototype.getDatasource = function () { return this.gridOptions.datasource; };
+            GridOptionsWrapper.prototype.getReady = function () { return this.gridOptions.ready; };
+            GridOptionsWrapper.prototype.getRowBuffer = function () { return this.gridOptions.rowBuffer; };
+            GridOptionsWrapper.prototype.isEnableSorting = function () { return isTrue(this.gridOptions.enableSorting) || isTrue(this.gridOptions.enableServerSideSorting); };
+            GridOptionsWrapper.prototype.isEnableCellExpressions = function () { return isTrue(this.gridOptions.enableCellExpressions); };
+            GridOptionsWrapper.prototype.isEnableServerSideSorting = function () { return isTrue(this.gridOptions.enableServerSideSorting); };
+            GridOptionsWrapper.prototype.isEnableFilter = function () { return isTrue(this.gridOptions.enableFilter) || isTrue(this.gridOptions.enableServerSideFilter); };
+            GridOptionsWrapper.prototype.isEnableServerSideFilter = function () { return this.gridOptions.enableServerSideFilter; };
+            GridOptionsWrapper.prototype.isSuppressScrollLag = function () { return isTrue(this.gridOptions.suppressScrollLag); };
+            GridOptionsWrapper.prototype.setSelectedRows = function (newSelectedRows) { return this.gridOptions.selectedRows = newSelectedRows; };
+            GridOptionsWrapper.prototype.setSelectedNodesById = function (newSelectedNodes) { return this.gridOptions.selectedNodesById = newSelectedNodes; };
+            GridOptionsWrapper.prototype.getIcons = function () { return this.gridOptions.icons; };
+            GridOptionsWrapper.prototype.getIsScrollLag = function () { return this.gridOptions.isScrollLag; };
+            GridOptionsWrapper.prototype.getSortingOrder = function () { return this.gridOptions.sortingOrder; };
+            GridOptionsWrapper.prototype.getSlaveGrids = function () { return this.gridOptions.slaveGrids; };
+            GridOptionsWrapper.prototype.getGroupRowRenderer = function () { return this.gridOptions.groupRowRenderer; };
             GridOptionsWrapper.prototype.getGroupRowInnerRenderer = function () {
                 if (this.gridOptions.groupInnerRenderer) {
                     console.warn('ag-grid: as of v1.10.0 (21st Jun 2015) groupInnerRenderer is now called groupRowInnerRenderer. Please change you code as groupInnerRenderer is deprecated.');
@@ -1037,6 +900,10 @@ var awk;
                         return;
                     }
                     switch (event.getType()) {
+                        // we don't do anything for these three events
+                        //case ColumnChangeEvent.TYPE_EVERYTHING:
+                        //case ColumnChangeEvent.TYPE_PIVOT_CHANGE:
+                        //case ColumnChangeEvent.TYPE_VALUE_CHANGE:
                         case grid.ColumnChangeEvent.TYPE_COLUMN_MOVED:
                             _this.logger.log('onColumnEvent-> processing ' + event + ' fromIndex = ' + event.getFromIndex() + ', toIndex = ' + event.getToIndex());
                             _this.columnController.moveColumn(event.getFromIndex(), event.getToIndex());
@@ -1201,7 +1068,9 @@ var awk;
                 this.allColumns.splice(fromIndex, 1);
                 this.allColumns.splice(toIndex, 0, column);
                 this.updateModel();
-                var event = new grid.ColumnChangeEvent(grid.ColumnChangeEvent.TYPE_COLUMN_MOVED).withFromIndex(fromIndex).withToIndex(toIndex);
+                var event = new grid.ColumnChangeEvent(grid.ColumnChangeEvent.TYPE_COLUMN_MOVED)
+                    .withFromIndex(fromIndex)
+                    .withToIndex(toIndex);
                 this.fireColumnChanged(event);
                 if (typeof this.gridOptionsWrapper.getColumnOrderChanged() === 'function') {
                     this.gridOptionsWrapper.getColumnOrderChanged()(this.allColumns);
@@ -1238,6 +1107,22 @@ var awk;
                 this.fireColumnChanged(new grid.ColumnChangeEvent(grid.ColumnChangeEvent.TYPE_COLUMN_VISIBLE).withColumn(column));
                 if (typeof this.gridOptionsWrapper.getColumnVisibilityChanged() === 'function') {
                     this.gridOptionsWrapper.getColumnVisibilityChanged()(this.allColumns);
+                }
+            };
+            ColumnController.prototype.getFristVisibleCol = function () {
+                if (this.visibleColumns.length > 0) {
+                    return this.visibleColumns[0];
+                }
+                else {
+                    return null;
+                }
+            };
+            ColumnController.prototype.getLastVisibleCol = function () {
+                if (this.visibleColumns.length > 0) {
+                    return this.visibleColumns[this.visibleColumns.length - 1];
+                }
+                else {
+                    return null;
                 }
             };
             ColumnController.prototype.getVisibleColBefore = function (col) {
@@ -1340,8 +1225,8 @@ var awk;
                     }
                     for (var i = 0; i < list.length; i++) {
                         var colDefMatches = list[i].colDef === key;
-                        var fieldMatches = list[i].colId === key;
-                        if (colDefMatches || fieldMatches) {
+                        var idMatches = list[i].colId === key;
+                        if (colDefMatches || idMatches) {
                             return list[i];
                         }
                     }
@@ -1446,7 +1331,8 @@ var awk;
                 if (updatedCols.length > 0) {
                     this.updateModel();
                     updatedCols.forEach(function (column) {
-                        var event = new grid.ColumnChangeEvent(grid.ColumnChangeEvent.TYPE_COLUMN_VISIBLE).withColumn(column);
+                        var event = new grid.ColumnChangeEvent(grid.ColumnChangeEvent.TYPE_COLUMN_VISIBLE)
+                            .withColumn(column);
                         _this.fireColumnChanged(event);
                     });
                 }
@@ -1485,6 +1371,8 @@ var awk;
                 var colsToSpread = _.filter(this.displayedColumns, function (column) {
                     return column.colDef.suppressSizeToFit !== true;
                 });
+                // make a copy of the cols that are going to be resized
+                var colsToFireEventFor = colsToSpread.slice(0);
                 var finishedResizing = false;
                 while (!finishedResizing) {
                     finishedResizing = true;
@@ -1501,6 +1389,7 @@ var awk;
                         // we set the pixels for the last col based on what's left, as otherwise
                         // we could be a pixel or two short or extra because of rounding errors.
                         var pixelsForLastCol = availablePixels;
+                        // backwards through loop, as we are removing items as we go
                         for (var i = colsToSpread.length - 1; i >= 0; i--) {
                             var column = colsToSpread[i];
                             var newWidth = Math.round(column.actualWidth * scale);
@@ -1529,7 +1418,10 @@ var awk;
                     }
                 }
                 // widths set, refresh the gui
-                this.fireColumnChanged(new grid.ColumnChangeEvent(grid.ColumnChangeEvent.TYPE_COLUMN_RESIZED));
+                colsToFireEventFor.forEach(function (column) {
+                    var event = new grid.ColumnChangeEvent(grid.ColumnChangeEvent.TYPE_COLUMN_RESIZED).withColumn(column);
+                    _this.fireColumnChanged(event);
+                });
                 function moveToNotSpread(column) {
                     _.removeFromArray(colsToSpread, column);
                     colsToNotSpread.push(column);
@@ -1590,7 +1482,10 @@ var awk;
             ColumnController.prototype.updateVisibleColumns = function () {
                 this.visibleColumns = [];
                 // see if we need to insert the default grouping column
-                var needAGroupColumn = this.pivotColumns.length > 0 && !this.gridOptionsWrapper.isGroupSuppressAutoColumn() && !this.gridOptionsWrapper.isGroupUseEntireRow() && !this.gridOptionsWrapper.isGroupSuppressRow();
+                var needAGroupColumn = this.pivotColumns.length > 0
+                    && !this.gridOptionsWrapper.isGroupSuppressAutoColumn()
+                    && !this.gridOptionsWrapper.isGroupUseEntireRow()
+                    && !this.gridOptionsWrapper.isGroupSuppressRow();
                 var localeTextFunc = this.gridOptionsWrapper.getLocaleTextFunc();
                 if (needAGroupColumn) {
                     // if one provided by user, use it, otherwise create one
@@ -1610,7 +1505,8 @@ var awk;
                 }
                 for (var i = 0; i < this.allColumns.length; i++) {
                     var column = this.allColumns[i];
-                    var hideBecauseOfPivot = this.pivotColumns.indexOf(column) >= 0 && this.gridOptionsWrapper.isGroupHidePivotColumns();
+                    var hideBecauseOfPivot = this.pivotColumns.indexOf(column) >= 0
+                        && this.gridOptionsWrapper.isGroupHidePivotColumns();
                     if (column.visible && !hideBecauseOfPivot) {
                         column.index = this.visibleColumns.length;
                         this.visibleColumns.push(this.allColumns[i]);
@@ -1652,6 +1548,7 @@ var awk;
             };
             ColumnController.prototype.createValueColumns = function () {
                 this.valueColumns = [];
+                // override with columns that have the aggFunc specified explicitly
                 for (var i = 0; i < this.allColumns.length; i++) {
                     var column = this.allColumns[i];
                     if (column.colDef.aggFunc) {
@@ -1761,7 +1658,22 @@ var awk;
     var grid;
     (function (grid) {
         var utils = grid.Utils;
-        var template = '<div>' + '<div>' + '<select class="ag-filter-select" id="filterType">' + '<option value="1">[CONTAINS]</option>' + '<option value="2">[EQUALS]</option>' + '<option value="3">[STARTS WITH]</option>' + '<option value="4">[ENDS WITH]</option>' + '</select>' + '</div>' + '<div>' + '<input class="ag-filter-filter" id="filterText" type="text" placeholder="[FILTER...]"/>' + '</div>' + '<div class="ag-filter-apply-panel" id="applyPanel">' + '<button type="button" id="applyButton">Apply Filter</button>' + '</div>' + '</div>';
+        var template = '<div>' +
+            '<div>' +
+            '<select class="ag-filter-select" id="filterType">' +
+            '<option value="1">[CONTAINS]</option>' +
+            '<option value="2">[EQUALS]</option>' +
+            '<option value="3">[STARTS WITH]</option>' +
+            '<option value="4">[ENDS WITH]</option>' +
+            '</select>' +
+            '</div>' +
+            '<div>' +
+            '<input class="ag-filter-filter" id="filterText" type="text" placeholder="[FILTER...]"/>' +
+            '</div>' +
+            '<div class="ag-filter-apply-panel" id="applyPanel">' +
+            '<button type="button" id="applyButton">Apply Filter</button>' +
+            '</div>' +
+            '</div>';
         var CONTAINS = 1;
         var EQUALS = 2;
         var STARTS_WITH = 3;
@@ -1821,7 +1733,12 @@ var awk;
                 return this.filterText !== null;
             };
             TextFilter.prototype.createTemplate = function () {
-                return template.replace('[FILTER...]', this.localeTextFunc('filterOoo', 'Filter...')).replace('[EQUALS]', this.localeTextFunc('equals', 'Equals')).replace('[CONTAINS]', this.localeTextFunc('contains', 'Contains')).replace('[STARTS WITH]', this.localeTextFunc('startsWith', 'Starts with')).replace('[ENDS WITH]', this.localeTextFunc('endsWith', 'Ends with'));
+                return template
+                    .replace('[FILTER...]', this.localeTextFunc('filterOoo', 'Filter...'))
+                    .replace('[EQUALS]', this.localeTextFunc('equals', 'Equals'))
+                    .replace('[CONTAINS]', this.localeTextFunc('contains', 'Contains'))
+                    .replace('[STARTS WITH]', this.localeTextFunc('startsWith', 'Starts with'))
+                    .replace('[ENDS WITH]', this.localeTextFunc('endsWith', 'Ends with'));
             };
             TextFilter.prototype.createGui = function () {
                 this.eGui = utils.loadTemplate(this.createTemplate());
@@ -1935,7 +1852,21 @@ var awk;
     var grid;
     (function (grid) {
         var utils = grid.Utils;
-        var template = '<div>' + '<div>' + '<select class="ag-filter-select" id="filterType">' + '<option value="1">[EQUALS]</option>' + '<option value="2">[LESS THAN]</option>' + '<option value="3">[GREATER THAN]</option>' + '</select>' + '</div>' + '<div>' + '<input class="ag-filter-filter" id="filterText" type="text" placeholder="[FILTER...]"/>' + '</div>' + '<div class="ag-filter-apply-panel" id="applyPanel">' + '<button type="button" id="applyButton">Apply Filter</button>' + '</div>' + '</div>';
+        var template = '<div>' +
+            '<div>' +
+            '<select class="ag-filter-select" id="filterType">' +
+            '<option value="1">[EQUALS]</option>' +
+            '<option value="2">[LESS THAN]</option>' +
+            '<option value="3">[GREATER THAN]</option>' +
+            '</select>' +
+            '</div>' +
+            '<div>' +
+            '<input class="ag-filter-filter" id="filterText" type="text" placeholder="[FILTER...]"/>' +
+            '</div>' +
+            '<div class="ag-filter-apply-panel" id="applyPanel">' +
+            '<button type="button" id="applyButton">Apply Filter</button>' +
+            '</div>' +
+            '</div>';
         var EQUALS = 1;
         var LESS_THAN = 2;
         var GREATER_THAN = 3;
@@ -1997,7 +1928,11 @@ var awk;
                 return this.filterNumber !== null;
             };
             NumberFilter.prototype.createTemplate = function () {
-                return template.replace('[FILTER...]', this.localeTextFunc('filterOoo', 'Filter...')).replace('[EQUALS]', this.localeTextFunc('equals', 'Equals')).replace('[LESS THAN]', this.localeTextFunc('lessThan', 'Less than')).replace('[GREATER THAN]', this.localeTextFunc('greaterThan', 'Greater than'));
+                return template
+                    .replace('[FILTER...]', this.localeTextFunc('filterOoo', 'Filter...'))
+                    .replace('[EQUALS]', this.localeTextFunc('equals', 'Equals'))
+                    .replace('[LESS THAN]', this.localeTextFunc('lessThan', 'Less than'))
+                    .replace('[GREATER THAN]', this.localeTextFunc('greaterThan', 'Greater than'));
             };
             NumberFilter.prototype.createGui = function () {
                 this.eGui = utils.loadTemplate(this.createTemplate());
@@ -2306,7 +2241,30 @@ var awk;
     var grid;
     (function (grid) {
         var _ = grid.Utils;
-        var template = '<div>' + '<div class="ag-filter-header-container">' + '<input class="ag-filter-filter" type="text" placeholder="[SEARCH...]"/>' + '</div>' + '<div class="ag-filter-header-container">' + '<label>' + '<input id="selectAll" type="checkbox" class="ag-filter-checkbox"/>' + '([SELECT ALL])' + '</label>' + '</div>' + '<div class="ag-filter-list-viewport">' + '<div class="ag-filter-list-container">' + '<div id="itemForRepeat" class="ag-filter-item">' + '<label>' + '<input type="checkbox" class="ag-filter-checkbox" filter-checkbox="true"/>' + '<span class="ag-filter-value"></span>' + '</label>' + '</div>' + '</div>' + '</div>' + '<div class="ag-filter-apply-panel" id="applyPanel">' + '<button type="button" id="applyButton">Apply Filter</button>' + '</div>' + '</div>';
+        var template = '<div>' +
+            '<div class="ag-filter-header-container">' +
+            '<input class="ag-filter-filter" type="text" placeholder="[SEARCH...]"/>' +
+            '</div>' +
+            '<div class="ag-filter-header-container">' +
+            '<label>' +
+            '<input id="selectAll" type="checkbox" class="ag-filter-checkbox"/>' +
+            '([SELECT ALL])' +
+            '</label>' +
+            '</div>' +
+            '<div class="ag-filter-list-viewport">' +
+            '<div class="ag-filter-list-container">' +
+            '<div id="itemForRepeat" class="ag-filter-item">' +
+            '<label>' +
+            '<input type="checkbox" class="ag-filter-checkbox" filter-checkbox="true"/>' +
+            '<span class="ag-filter-value"></span>' +
+            '</label>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="ag-filter-apply-panel" id="applyPanel">' +
+            '<button type="button" id="applyButton">Apply Filter</button>' +
+            '</div>' +
+            '</div>';
         var DEFAULT_ROW_HEIGHT = 20;
         var SetFilter = (function () {
             function SetFilter(params) {
@@ -2370,7 +2328,9 @@ var awk;
                 this.refreshVirtualRows();
             };
             SetFilter.prototype.createTemplate = function () {
-                return template.replace('[SELECT ALL]', this.localeTextFunc('selectAll', 'Select All')).replace('[SEARCH...]', this.localeTextFunc('searchOoo', 'Search...'));
+                return template
+                    .replace('[SELECT ALL]', this.localeTextFunc('selectAll', 'Select All'))
+                    .replace('[SEARCH...]', this.localeTextFunc('searchOoo', 'Search...'));
             };
             SetFilter.prototype.createGui = function () {
                 var _this = this;
@@ -2427,6 +2387,7 @@ var awk;
                 var _this = this;
                 //at the end, this array will contain the items we need to remove
                 var rowsToRemove = Object.keys(this.rowsInBodyContainer);
+                //add in new rows
                 for (var rowIndex = start; rowIndex <= finish; rowIndex++) {
                     //see if item already there, and if yes, take it out of the 'to remove' array
                     if (rowsToRemove.indexOf(rowIndex.toString()) >= 0) {
@@ -2654,7 +2615,7 @@ var awk;
             //adds an element to a div, but also listens to background checking for clicks,
             //so that when the background is clicked, the child is removed again, giving
             //a model look to popups.
-            PopupService.prototype.addAsModalPopup = function (eChild) {
+            PopupService.prototype.addAsModalPopup = function (eChild, closeOnEsc) {
                 var eBody = document.body;
                 if (!eBody) {
                     console.warn('ag-grid: could not find the body of the document, document.body is empty');
@@ -2665,19 +2626,29 @@ var awk;
                     return;
                 }
                 this.ePopupParent.appendChild(eChild);
+                var that = this;
                 // if we add these listeners now, then the current mouse
                 // click will be included, which we don't want
                 setTimeout(function () {
+                    if (closeOnEsc) {
+                        eBody.addEventListener('keydown', hidePopupOnEsc);
+                    }
                     eBody.addEventListener('click', hidePopup);
                     eChild.addEventListener('click', consumeClick);
                 }, 0);
                 var eventFromChild = null;
-                var that = this;
+                function hidePopupOnEsc(event) {
+                    var key = event.which || event.keyCode;
+                    if (key === grid.Constants.KEY_ESCAPE) {
+                        hidePopup(null);
+                    }
+                }
                 function hidePopup(event) {
                     if (event && event === eventFromChild) {
                         return;
                     }
                     that.ePopupParent.removeChild(eChild);
+                    eBody.removeEventListener('keydown', hidePopupOnEsc);
                     eBody.removeEventListener('click', hidePopup);
                     eChild.removeEventListener('click', consumeClick);
                 }
@@ -2700,8 +2671,8 @@ var awk;
 var awk;
 (function (awk) {
     var grid;
-    (function (_grid) {
-        var utils = _grid.Utils;
+    (function (grid_1) {
+        var _ = grid_1.Utils;
         var FilterManager = (function () {
             function FilterManager() {
             }
@@ -2716,35 +2687,29 @@ var awk;
                 this.valueService = valueService;
             };
             FilterManager.prototype.setFilterModel = function (model) {
-                var that = this;
+                var _this = this;
                 if (model) {
                     // mark the filters as we set them, so any active filters left over we stop
-                    var processedFields = Object.keys(model);
-                    utils.iterateObject(this.allFilters, function (key, filterWrapper) {
-                        var field = filterWrapper.column.colDef.field;
-                        utils.removeFromArray(processedFields, field);
-                        if (field) {
-                            var newModel = model[field];
-                            that.setModelOnFilterWrapper(filterWrapper.filter, newModel);
-                        }
-                        else {
-                            console.warn('Warning ag-grid - no field found for column while doing setFilterModel');
-                        }
+                    var modelKeys = Object.keys(model);
+                    _.iterateObject(this.allFilters, function (colId, filterWrapper) {
+                        _.removeFromArray(modelKeys, colId);
+                        var newModel = model[colId];
+                        _this.setModelOnFilterWrapper(filterWrapper.filter, newModel);
                     });
                     // at this point, processedFields contains data for which we don't have a filter working yet
-                    utils.iterateArray(processedFields, function (field) {
-                        var column = that.columnModel.getColumn(field);
+                    _.iterateArray(modelKeys, function (colId) {
+                        var column = _this.columnModel.getColumn(colId);
                         if (!column) {
-                            console.warn('Warning ag-grid - no column found for field ' + field);
+                            console.warn('Warning ag-grid setFilterModel - no column found for colId ' + colId);
                             return;
                         }
-                        var filterWrapper = that.getOrCreateFilterWrapper(column);
-                        that.setModelOnFilterWrapper(filterWrapper.filter, model[field]);
+                        var filterWrapper = _this.getOrCreateFilterWrapper(column);
+                        _this.setModelOnFilterWrapper(filterWrapper.filter, model[colId]);
                     });
                 }
                 else {
-                    utils.iterateObject(this.allFilters, function (key, filterWrapper) {
-                        that.setModelOnFilterWrapper(filterWrapper.filter, null);
+                    _.iterateObject(this.allFilters, function (key, filterWrapper) {
+                        _this.setModelOnFilterWrapper(filterWrapper.filter, null);
                     });
                 }
             };
@@ -2763,7 +2728,7 @@ var awk;
             };
             FilterManager.prototype.getFilterModel = function () {
                 var result = {};
-                utils.iterateObject(this.allFilters, function (key, filterWrapper) {
+                _.iterateObject(this.allFilters, function (key, filterWrapper) {
                     // because user can provide filters, we provide useful error checking and messages
                     if (typeof filterWrapper.filter.getApi !== 'function') {
                         console.warn('Warning ag-grid - filter missing getApi method, which is needed for getFilterModel');
@@ -2776,13 +2741,7 @@ var awk;
                     }
                     var model = filterApi.getModel();
                     if (model) {
-                        var field = filterWrapper.column.colDef.field;
-                        if (!field) {
-                            console.warn('Warning ag-grid - cannot get filter model when no field value present for column');
-                        }
-                        else {
-                            result[field] = model;
-                        }
+                        result[key] = model;
                     }
                 });
                 return result;
@@ -2793,10 +2752,7 @@ var awk;
             // returns true if at least one filter is active
             FilterManager.prototype.isFilterPresent = function () {
                 var atLeastOneActive = false;
-                var that = this;
-                var keys = Object.keys(this.allFilters);
-                keys.forEach(function (key) {
-                    var filterWrapper = that.allFilters[key];
+                _.iterateObject(this.allFilters, function (key, filterWrapper) {
                     if (!filterWrapper.filter.isFilterActive) {
                         console.error('Filter is missing method isFilterActive');
                     }
@@ -2906,13 +2862,13 @@ var awk;
                     filterWrapper.filter = new colDef.filter(params);
                 }
                 else if (colDef.filter === 'text') {
-                    filterWrapper.filter = new _grid.TextFilter(params);
+                    filterWrapper.filter = new grid_1.TextFilter(params);
                 }
                 else if (colDef.filter === 'number') {
-                    filterWrapper.filter = new _grid.NumberFilter(params);
+                    filterWrapper.filter = new grid_1.NumberFilter(params);
                 }
                 else {
-                    filterWrapper.filter = new _grid.SetFilter(params);
+                    filterWrapper.filter = new grid_1.SetFilter(params);
                 }
                 if (!filterWrapper.filter.getGui) {
                     throw 'Filter is missing method getGui';
@@ -2920,7 +2876,7 @@ var awk;
                 var eFilterGui = document.createElement('div');
                 eFilterGui.className = 'ag-filter';
                 var guiFromFilter = filterWrapper.filter.getGui();
-                if (utils.isNodeOrElement(guiFromFilter)) {
+                if (_.isNodeOrElement(guiFromFilter)) {
                     //a dom node or element was returned, so add child
                     eFilterGui.appendChild(guiFromFilter);
                 }
@@ -2941,14 +2897,18 @@ var awk;
             FilterManager.prototype.showFilter = function (column, eventSource) {
                 var filterWrapper = this.getOrCreateFilterWrapper(column);
                 this.popupService.positionPopup(eventSource, filterWrapper.gui, 200);
-                var hidePopup = this.popupService.addAsModalPopup(filterWrapper.gui);
+                var hidePopup = this.popupService.addAsModalPopup(filterWrapper.gui, true);
                 if (filterWrapper.filter.afterGuiAttached) {
-                    filterWrapper.filter.afterGuiAttached({ hidePopup: hidePopup });
+                    var params = {
+                        hidePopup: hidePopup,
+                        eventSource: eventSource
+                    };
+                    filterWrapper.filter.afterGuiAttached(params);
                 }
             };
             return FilterManager;
         })();
-        _grid.FilterManager = FilterManager;
+        grid_1.FilterManager = FilterManager;
     })(grid = awk.grid || (awk.grid = {}));
 })(awk || (awk = {}));
 var awk;
@@ -3106,9 +3066,7 @@ var awk;
             VElement.prototype.elementAttached = function (element) {
                 this.fireElementAttached(element);
             };
-            VElement.prototype.toHtmlString = function () {
-                return null;
-            };
+            VElement.prototype.toHtmlString = function () { return null; };
             VElement.idSequence = 0;
             return VElement;
         })();
@@ -3117,7 +3075,7 @@ var awk;
 })(awk || (awk = {}));
 /// <reference path="vElement.ts" />
 /// <reference path="../utils.ts" />
-var __extends = this.__extends || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -3754,12 +3712,13 @@ var awk;
                         return;
                     }
                     var key = event.which || event.keyCode;
-                    var startNavigation = key === grid.Constants.KEY_DOWN || key === grid.Constants.KEY_UP || key === grid.Constants.KEY_LEFT || key === grid.Constants.KEY_RIGHT;
+                    var startNavigation = key === grid.Constants.KEY_DOWN || key === grid.Constants.KEY_UP
+                        || key === grid.Constants.KEY_LEFT || key === grid.Constants.KEY_RIGHT || key === grid.Constants.KEY_TAB;
                     if (startNavigation) {
                         event.preventDefault();
                         that.rowRenderer.navigateToNextCell(key, that.rowIndex, that.column);
                     }
-                    var startEdit = key === grid.Constants.KEY_ENTER;
+                    var startEdit = key === grid.Constants.KEY_ENTER || key === grid.Constants.KEY_F2;
                     if (startEdit && that.isCellEditable()) {
                         that.startEditing();
                         // if we don't prevent default, then the editor that get displayed also picks up the 'enter key'
@@ -4469,7 +4428,8 @@ var awk;
             }
             function getGroupName(params) {
                 var cellRenderer = params.colDef.cellRenderer;
-                if (cellRenderer && cellRenderer.keyMap && typeof cellRenderer.keyMap === 'object' && params.colDef.cellRenderer !== null) {
+                if (cellRenderer && cellRenderer.keyMap
+                    && typeof cellRenderer.keyMap === 'object' && params.colDef.cellRenderer !== null) {
                     var valueFromMap = cellRenderer.keyMap[params.node.key];
                     if (valueFromMap) {
                         return valueFromMap;
@@ -4687,6 +4647,7 @@ var awk;
                 var that = this;
                 // at the end, this array will contain the items we need to remove
                 var rowsToRemove = Object.keys(this.renderedRows);
+                // add in new rows
                 for (var rowIndex = this.firstVirtualRenderedRow; rowIndex <= this.lastVirtualRenderedRow; rowIndex++) {
                     // see if item already there, and if yes, take it out of the 'to remove' array
                     if (rowsToRemove.indexOf(rowIndex.toString()) >= 0) {
@@ -4738,6 +4699,7 @@ var awk;
                 var cellToFocus = { rowIndex: rowIndex, column: column };
                 var renderedRow;
                 var eCell;
+                // we keep searching for a next cell until we find one. this is how the group rows get skipped
                 while (!eCell) {
                     cellToFocus = this.getNextCellToFocus(key, cellToFocus);
                     // no next cell means we have reached a grid boundary, eg left, right, top or bottom of grid
@@ -4780,6 +4742,20 @@ var awk;
                         // if already on right, do nothing
                         if (!colToRight) {
                             return null;
+                        }
+                        nextRowToFocus = lastRowIndex;
+                        nextColumnToFocus = colToRight;
+                        break;
+                    case grid.Constants.KEY_TAB:
+                        // same as in KEY_RIGHT
+                        var colToRight = this.columnModel.getVisibleColAfter(lastColumn);
+                        // if already on right, go to next row and frist cell if possible
+                        if (!colToRight) {
+                            if (lastRowIndex === this.lastVirtualRenderedRow) {
+                                return null;
+                            }
+                            lastRowIndex = lastRowIndex + 1;
+                            colToRight = this.columnModel.getFristVisibleCol();
                         }
                         nextRowToFocus = lastRowIndex;
                         nextColumnToFocus = colToRight;
@@ -4832,7 +4808,7 @@ var awk;
                 var renderedRow = this.renderedRows[rowIndex];
                 var column = this.columnModel.getDisplayedColumns()[colIndex];
                 if (renderedRow && column) {
-                    var eCell = renderedRow.getCellForCol(column.colId);
+                    var eCell = renderedRow.getCellForCol(column);
                     this.focusCell(eCell, rowIndex, colIndex, column.colDef, true);
                 }
             };
@@ -5295,18 +5271,12 @@ var awk;
                 return this.eRoot;
             };
             // methods implemented by the base classes
-            RenderedHeaderElement.prototype.destroy = function () {
-            };
-            RenderedHeaderElement.prototype.refreshFilterIcon = function () {
-            };
-            RenderedHeaderElement.prototype.refreshSortIcon = function () {
-            };
-            RenderedHeaderElement.prototype.onDragStart = function () {
-            };
-            RenderedHeaderElement.prototype.onDragging = function (dragChange) {
-            };
-            RenderedHeaderElement.prototype.onIndividualColumnResized = function (column) {
-            };
+            RenderedHeaderElement.prototype.destroy = function () { };
+            RenderedHeaderElement.prototype.refreshFilterIcon = function () { };
+            RenderedHeaderElement.prototype.refreshSortIcon = function () { };
+            RenderedHeaderElement.prototype.onDragStart = function () { };
+            RenderedHeaderElement.prototype.onDragging = function (dragChange) { };
+            RenderedHeaderElement.prototype.onIndividualColumnResized = function (column) { };
             RenderedHeaderElement.prototype.addDragHandler = function (eDraggableElement) {
                 var that = this;
                 eDraggableElement.addEventListener('mousedown', function (downEvent) {
@@ -5968,6 +5938,7 @@ var awk;
                         }
                     }
                 }
+                //remove the temporary map
                 for (i = 0; i < allGroups.length; i++) {
                     delete allGroups[i].childrenMap;
                 }
@@ -6061,6 +6032,7 @@ var awk;
             };
             // public
             InMemoryRowController.prototype.updateModel = function (step) {
+                // fallthrough in below switch is on purpose
                 switch (step) {
                     case constants.STEP_EVERYTHING:
                     case constants.STEP_FILTER:
@@ -6260,6 +6232,7 @@ var awk;
                 this.updateChildIndexes(rowNodes);
             };
             InMemoryRowController.prototype.sortList = function (nodes, sortOptions) {
+                // sort any groups recursively
                 for (var i = 0, l = nodes.length; i < l; i++) {
                     var node = nodes[i];
                     if (node.group && node.children) {
@@ -6281,6 +6254,7 @@ var awk;
                     }
                 }
                 nodes.sort(function (objA, objB) {
+                    // Iterate columns, return the first that doesn't match
                     for (var i = 0, len = sortOptions.length; i < len; i++) {
                         var sortOption = sortOptions[i];
                         var compared = compare(objA, objB, sortOption.column, sortOption.inverter === -1);
@@ -6832,7 +6806,25 @@ var awk;
     var grid;
     (function (grid) {
         var utils = grid.Utils;
-        var template = '<div class="ag-paging-panel">' + '<span id="pageRowSummaryPanel" class="ag-paging-row-summary-panel">' + '<span id="firstRowOnPage"></span>' + ' [TO] ' + '<span id="lastRowOnPage"></span>' + ' [OF] ' + '<span id="recordCount"></span>' + '</span>' + '<span class="ag-paging-page-summary-panel">' + '<button class="ag-paging-button" id="btFirst">[FIRST]</button>' + '<button class="ag-paging-button" id="btPrevious">[PREVIOUS]</button>' + '[PAGE] ' + '<span id="current"></span>' + ' [OF] ' + '<span id="total"></span>' + '<button class="ag-paging-button" id="btNext">[NEXT]</button>' + '<button class="ag-paging-button" id="btLast">[LAST]</button>' + '</span>' + '</div>';
+        var template = '<div class="ag-paging-panel">' +
+            '<span id="pageRowSummaryPanel" class="ag-paging-row-summary-panel">' +
+            '<span id="firstRowOnPage"></span>' +
+            ' [TO] ' +
+            '<span id="lastRowOnPage"></span>' +
+            ' [OF] ' +
+            '<span id="recordCount"></span>' +
+            '</span>' +
+            '<span class="ag-paging-page-summary-panel">' +
+            '<button class="ag-paging-button" id="btFirst">[FIRST]</button>' +
+            '<button class="ag-paging-button" id="btPrevious">[PREVIOUS]</button>' +
+            '[PAGE] ' +
+            '<span id="current"></span>' +
+            ' [OF] ' +
+            '<span id="total"></span>' +
+            '<button class="ag-paging-button" id="btNext">[NEXT]</button>' +
+            '<button class="ag-paging-button" id="btLast">[LAST]</button>' +
+            '</span>' +
+            '</div>';
         var PaginationController = (function () {
             function PaginationController() {
             }
@@ -7007,7 +6999,15 @@ var awk;
             };
             PaginationController.prototype.createTemplate = function () {
                 var localeTextFunc = this.gridOptionsWrapper.getLocaleTextFunc();
-                return template.replace('[PAGE]', localeTextFunc('page', 'Page')).replace('[TO]', localeTextFunc('to', 'to')).replace('[OF]', localeTextFunc('of', 'of')).replace('[OF]', localeTextFunc('of', 'of')).replace('[FIRST]', localeTextFunc('first', 'First')).replace('[PREVIOUS]', localeTextFunc('previous', 'Previous')).replace('[NEXT]', localeTextFunc('next', 'Next')).replace('[LAST]', localeTextFunc('last', 'Last'));
+                return template
+                    .replace('[PAGE]', localeTextFunc('page', 'Page'))
+                    .replace('[TO]', localeTextFunc('to', 'to'))
+                    .replace('[OF]', localeTextFunc('of', 'of'))
+                    .replace('[OF]', localeTextFunc('of', 'of'))
+                    .replace('[FIRST]', localeTextFunc('first', 'First'))
+                    .replace('[PREVIOUS]', localeTextFunc('previous', 'Previous'))
+                    .replace('[NEXT]', localeTextFunc('next', 'Next'))
+                    .replace('[LAST]', localeTextFunc('last', 'Last'));
             };
             PaginationController.prototype.getGui = function () {
                 return this.eGui;
@@ -7056,15 +7056,41 @@ var awk;
                 var template;
                 if (!params.dontFill) {
                     if (this.fullHeight) {
-                        template = '<div style="height: 100%; overflow: auto; position: relative;">' + '<div id="west" style="height: 100%; float: left;"></div>' + '<div id="east" style="height: 100%; float: right;"></div>' + '<div id="center" style="height: 100%;"></div>' + '<div id="overlay" style="position: absolute; height: 100%; width: 100%; top: 0px; left: 0px;"></div>' + '</div>';
+                        template =
+                            '<div style="height: 100%; overflow: auto; position: relative;">' +
+                                '<div id="west" style="height: 100%; float: left;"></div>' +
+                                '<div id="east" style="height: 100%; float: right;"></div>' +
+                                '<div id="center" style="height: 100%;"></div>' +
+                                '<div id="overlay" style="position: absolute; height: 100%; width: 100%; top: 0px; left: 0px;"></div>' +
+                                '</div>';
                     }
                     else {
-                        template = '<div style="height: 100%; position: relative;">' + '<div id="north"></div>' + '<div id="centerRow" style="height: 100%; overflow: hidden;">' + '<div id="west" style="height: 100%; float: left;"></div>' + '<div id="east" style="height: 100%; float: right;"></div>' + '<div id="center" style="height: 100%;"></div>' + '</div>' + '<div id="south"></div>' + '<div id="overlay" style="position: absolute; height: 100%; width: 100%; top: 0px; left: 0px;"></div>' + '</div>';
+                        template =
+                            '<div style="height: 100%; position: relative;">' +
+                                '<div id="north"></div>' +
+                                '<div id="centerRow" style="height: 100%; overflow: hidden;">' +
+                                '<div id="west" style="height: 100%; float: left;"></div>' +
+                                '<div id="east" style="height: 100%; float: right;"></div>' +
+                                '<div id="center" style="height: 100%;"></div>' +
+                                '</div>' +
+                                '<div id="south"></div>' +
+                                '<div id="overlay" style="position: absolute; height: 100%; width: 100%; top: 0px; left: 0px;"></div>' +
+                                '</div>';
                     }
                     this.layoutActive = true;
                 }
                 else {
-                    template = '<div style="position: relative;">' + '<div id="north"></div>' + '<div id="centerRow">' + '<div id="west"></div>' + '<div id="east"></div>' + '<div id="center"></div>' + '</div>' + '<div id="south"></div>' + '<div id="overlay" style="position: absolute; height: 100%; width: 100%; top: 0px; left: 0px;"></div>' + '</div>';
+                    template =
+                        '<div style="position: relative;">' +
+                            '<div id="north"></div>' +
+                            '<div id="centerRow">' +
+                            '<div id="west"></div>' +
+                            '<div id="east"></div>' +
+                            '<div id="center"></div>' +
+                            '</div>' +
+                            '<div id="south"></div>' +
+                            '<div id="overlay" style="position: absolute; height: 100%; width: 100%; top: 0px; left: 0px;"></div>' +
+                            '</div>';
                     this.layoutActive = false;
                 }
                 this.eGui = _.loadTemplate(template);
@@ -7211,11 +7237,36 @@ var awk;
 (function (awk) {
     var grid;
     (function (grid) {
-        var gridHtml = '<div>' + '<!-- header -->' + '<div class="ag-header">' + '<div class="ag-pinned-header"></div><div class="ag-header-viewport"><div class="ag-header-container"></div></div>' + '</div>' + '<!-- body -->' + '<div class="ag-body">' + '<div class="ag-pinned-cols-viewport">' + '<div class="ag-pinned-cols-container"></div>' + '</div>' + '<div class="ag-body-viewport-wrapper">' + '<div class="ag-body-viewport">' + '<div class="ag-body-container"></div>' + '</div>' + '</div>' + '</div>' + '</div>';
-        var gridNoScrollsHtml = '<div>' + '<!-- header -->' + '<div class="ag-header-container"></div>' + '<!-- body -->' + '<div class="ag-body-container"></div>' + '</div>';
+        var gridHtml = '<div>' +
+            '<!-- header -->' +
+            '<div class="ag-header">' +
+            '<div class="ag-pinned-header"></div><div class="ag-header-viewport"><div class="ag-header-container"></div></div>' +
+            '</div>' +
+            '<!-- body -->' +
+            '<div class="ag-body">' +
+            '<div class="ag-pinned-cols-viewport">' +
+            '<div class="ag-pinned-cols-container"></div>' +
+            '</div>' +
+            '<div class="ag-body-viewport-wrapper">' +
+            '<div class="ag-body-viewport">' +
+            '<div class="ag-body-container"></div>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '</div>';
+        var gridNoScrollsHtml = '<div>' +
+            '<!-- header -->' +
+            '<div class="ag-header-container"></div>' +
+            '<!-- body -->' +
+            '<div class="ag-body-container"></div>' +
+            '</div>';
         // wrapping in outer div, and wrapper, is needed to center the loading icon
         // The idea for centering came from here: http://www.vanseodesign.com/css/vertical-centering/
-        var loadingHtml = '<div class="ag-loading-panel">' + '<div class="ag-loading-wrapper">' + '<span class="ag-loading-center">Loading...</span>' + '</div>' + '</div>';
+        var loadingHtml = '<div class="ag-loading-panel">' +
+            '<div class="ag-loading-wrapper">' +
+            '<span class="ag-loading-center">Loading...</span>' +
+            '</div>' +
+            '</div>';
         var utils = grid.Utils;
         var GridPanel = (function () {
             function GridPanel(gridOptionsWrapper) {
@@ -7288,13 +7339,15 @@ var awk;
                 }
                 var columns = this.columnModel.getDisplayedColumns();
                 if (typeof index !== 'number' || index < 0 || index >= columns.length) {
-                    console.warn('invalid col index for ensureColIndexVisible: ' + index + ', should be between 0 and ' + (columns.length - 1));
+                    console.warn('invalid col index for ensureColIndexVisible: ' + index
+                        + ', should be between 0 and ' + (columns.length - 1));
                     return;
                 }
                 var column = columns[index];
                 var pinnedColCount = this.gridOptionsWrapper.getPinnedColCount();
                 if (index < pinnedColCount) {
-                    console.warn('invalid col index for ensureColIndexVisible: ' + index + ', scrolling to a pinned col makes no sense');
+                    console.warn('invalid col index for ensureColIndexVisible: ' + index
+                        + ', scrolling to a pinned col makes no sense');
                     return;
                 }
                 // sum up all col width to the let to get the start pixel
@@ -7601,7 +7654,12 @@ var awk;
         //var template = require('./agList.html');
         var utils = grid.Utils;
         var dragAndDropService = grid.DragAndDropService.getInstance();
-        var template = '<div class="ag-list-selection">' + '<div>' + '<div ag-repeat class="ag-list-item">' + '</div>' + '</div>' + '</div>';
+        var template = '<div class="ag-list-selection">' +
+            '<div>' +
+            '<div ag-repeat class="ag-list-item">' +
+            '</div>' +
+            '</div>' +
+            '</div>';
         var DropTargetLocation;
         (function (DropTargetLocation) {
             DropTargetLocation[DropTargetLocation["NOT_DROP_TARGET"] = 0] = "NOT_DROP_TARGET";
@@ -7786,10 +7844,10 @@ var awk;
                 var result = dragItem.data !== targetColumn && dragItem.containerId === this.uniqueId;
                 if (result) {
                     if (this.dragAfterThisItem(targetColumn, dragItem.data)) {
-                        this.setDropCssClasses(eListItem, 1 /* DROP_TARGET_ABOVE */);
+                        this.setDropCssClasses(eListItem, DropTargetLocation.DROP_TARGET_ABOVE);
                     }
                     else {
-                        this.setDropCssClasses(eListItem, 2 /* DROP_TARGET_BELOW */);
+                        this.setDropCssClasses(eListItem, DropTargetLocation.DROP_TARGET_BELOW);
                     }
                 }
                 return result;
@@ -7808,15 +7866,15 @@ var awk;
                 }
             };
             AgList.prototype.internalNoDrop = function (eListItem) {
-                this.setDropCssClasses(eListItem, 0 /* NOT_DROP_TARGET */);
+                this.setDropCssClasses(eListItem, DropTargetLocation.NOT_DROP_TARGET);
             };
             AgList.prototype.dragAfterThisItem = function (targetColumn, draggedColumn) {
                 return this.model.indexOf(targetColumn) < this.model.indexOf(draggedColumn);
             };
             AgList.prototype.setDropCssClasses = function (eListItem, state) {
-                utils.addOrRemoveCssClass(eListItem, 'ag-not-drop-target', state === 0 /* NOT_DROP_TARGET */);
-                utils.addOrRemoveCssClass(eListItem, 'ag-drop-target-above', state === 1 /* DROP_TARGET_ABOVE */);
-                utils.addOrRemoveCssClass(eListItem, 'ag-drop-target-below', state === 2 /* DROP_TARGET_BELOW */);
+                utils.addOrRemoveCssClass(eListItem, 'ag-not-drop-target', state === DropTargetLocation.NOT_DROP_TARGET);
+                utils.addOrRemoveCssClass(eListItem, 'ag-drop-target-above', state === DropTargetLocation.DROP_TARGET_ABOVE);
+                utils.addOrRemoveCssClass(eListItem, 'ag-drop-target-below', state === DropTargetLocation.DROP_TARGET_BELOW);
             };
             AgList.prototype.getGui = function () {
                 return this.eGui;
@@ -8033,7 +8091,7 @@ var awk;
             AgDropdownList.prototype.onClick = function () {
                 var agListGui = this.agList.getGui();
                 this.popupService.positionPopup(this.eGui, agListGui, -1);
-                this.hidePopupCallback = this.popupService.addAsModalPopup(agListGui);
+                this.hidePopupCallback = this.popupService.addAsModalPopup(agListGui, true);
             };
             AgDropdownList.prototype.getGui = function () {
                 return this.eGui;
@@ -8240,7 +8298,7 @@ var awk;
 var awk;
 (function (awk) {
     var grid;
-    (function (_grid) {
+    (function (grid_2) {
         var GridApi = (function () {
             function GridApi(grid, rowRenderer, headerRenderer, filterManager, columnController, inMemoryRowController, selectionController, gridOptionsWrapper, gridPanel, valueService, masterSlaveService) {
                 this.grid = grid;
@@ -8296,15 +8354,15 @@ var awk;
                 return this.grid.rowModel;
             };
             GridApi.prototype.onGroupExpandedOrCollapsed = function (refreshFromIndex) {
-                this.grid.updateModelAndRefresh(_grid.Constants.STEP_MAP, refreshFromIndex);
+                this.grid.updateModelAndRefresh(grid_2.Constants.STEP_MAP, refreshFromIndex);
             };
             GridApi.prototype.expandAll = function () {
                 this.inMemoryRowController.expandOrCollapseAll(true, null);
-                this.grid.updateModelAndRefresh(_grid.Constants.STEP_MAP);
+                this.grid.updateModelAndRefresh(grid_2.Constants.STEP_MAP);
             };
             GridApi.prototype.collapseAll = function () {
                 this.inMemoryRowController.expandOrCollapseAll(false, null);
-                this.grid.updateModelAndRefresh(_grid.Constants.STEP_MAP);
+                this.grid.updateModelAndRefresh(grid_2.Constants.STEP_MAP);
             };
             GridApi.prototype.addVirtualRowListener = function (rowIndex, callback) {
                 this.grid.addVirtualRowListener(rowIndex, callback);
@@ -8433,9 +8491,12 @@ var awk;
             GridApi.prototype.getValue = function (colDef, data, node) {
                 return this.valueService.getValue(colDef, data, node);
             };
+            GridApi.prototype.getColumnController = function () {
+                return this.columnController;
+            };
             return GridApi;
         })();
-        _grid.GridApi = GridApi;
+        grid_2.GridApi = GridApi;
     })(grid = awk.grid || (awk.grid = {}));
 })(awk || (awk = {}));
 /// <reference path="gridOptionsWrapper.ts" />
@@ -8826,7 +8887,9 @@ var awk;
                 }
                 // ctrlKey for windows, metaKey for Apple
                 var ctrlKeyPressed = event.ctrlKey || event.metaKey;
-                var doDeselect = ctrlKeyPressed && selectionController.isNodeSelected(node) && gridOptionsWrapper.isRowDeselection();
+                var doDeselect = ctrlKeyPressed
+                    && selectionController.isNodeSelected(node)
+                    && gridOptionsWrapper.isRowDeselection();
                 if (doDeselect) {
                     selectionController.deselectNode(node);
                 }
@@ -8870,6 +8933,7 @@ var awk;
                 var rowCount = this.rowModel.getVirtualRowCount();
                 var comparatorIsAFunction = typeof comparator === 'function';
                 var indexToSelect = -1;
+                // go through all the nodes, find the one we want to show
                 for (var i = 0; i < rowCount; i++) {
                     var node = this.rowModel.getVirtualRow(i);
                     if (comparatorIsAFunction) {
@@ -8938,7 +9002,9 @@ var awk;
                     if (sortModelProvided && !column.colDef.suppressSorting) {
                         for (var j = 0; j < sortModel.length; j++) {
                             var sortModelEntry = sortModel[j];
-                            if (typeof sortModelEntry.field === 'string' && typeof column.colDef.field === 'string' && sortModelEntry.field === column.colDef.field) {
+                            if (typeof sortModelEntry.field === 'string'
+                                && typeof column.colDef.field === 'string'
+                                && sortModelEntry.field === column.colDef.field) {
                                 sortForCol = sortModelEntry.sort;
                                 sortedAt = j;
                             }

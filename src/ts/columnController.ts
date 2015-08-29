@@ -232,6 +232,22 @@ module awk.grid {
             }
         }
 
+        public getFristVisibleCol(): Column {
+            if (this.visibleColumns.length > 0) {
+                return this.visibleColumns[0];
+            } else {
+                return null;
+            }
+        }
+
+        public getLastVisibleCol(): Column {
+            if (this.visibleColumns.length > 0) {
+                return this.visibleColumns[this.visibleColumns.length - 1];
+            } else {
+                return null;
+            }
+        }
+
         public getVisibleColBefore(col: any): Column {
             var oldIndex = this.visibleColumns.indexOf(col);
             if (oldIndex > 0) {

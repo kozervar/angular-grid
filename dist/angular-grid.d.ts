@@ -106,11 +106,15 @@ declare module awk.grid {
         static MAX: string;
         static KEY_TAB: number;
         static KEY_ENTER: number;
+        static KEY_ESCAPE: number;
         static KEY_SPACE: number;
         static KEY_DOWN: number;
         static KEY_UP: number;
         static KEY_LEFT: number;
         static KEY_RIGHT: number;
+        static KEY_F2: number;
+        static KEY_END: number;
+        static KEY_HOME: number;
     }
 }
 declare module awk.grid {
@@ -226,7 +230,7 @@ declare module awk.grid {
         getIsScrollLag(): () => boolean;
         getSortingOrder(): string[];
         getSlaveGrids(): GridOptions[];
-        getGroupRowRenderer(): Object;
+        getGroupRowRenderer(): Object | Function;
         getGroupRowInnerRenderer(): (params: any) => void;
         getColWidth(): number;
         getHeaderHeight(): number;
@@ -305,6 +309,8 @@ declare module awk.grid {
         getDisplayedColumns(): Column[];
         getAllColumns(): Column[];
         setColumnVisible(column: Column, visible: boolean): void;
+        getFristVisibleCol(): Column;
+        getLastVisibleCol(): Column;
         getVisibleColBefore(col: any): Column;
         getVisibleColAfter(col: any): Column;
         isPinning(): boolean;
@@ -510,7 +516,7 @@ declare module awk.grid {
         private ePopupParent;
         init(ePopupParent: any): void;
         positionPopup(eventSource: any, ePopup: any, minWidth: any): void;
-        addAsModalPopup(eChild: any): (event: any) => void;
+        addAsModalPopup(eChild: any, closeOnEsc: boolean): (event: any) => void;
     }
 }
 declare module awk.grid {
@@ -1536,6 +1542,7 @@ declare module awk.grid {
         setColumnState(state: any): void;
         doLayout(): void;
         getValue(colDef: ColDef, data: any, node: any): any;
+        getColumnController(): ColumnController;
     }
 }
 declare module awk.grid {

@@ -347,6 +347,20 @@ module awk.grid {
                     nextRowToFocus = lastRowIndex;
                     nextColumnToFocus = colToRight;
                     break;
+                case Constants.KEY_TAB :
+                    // same as in KEY_RIGHT
+                    var colToRight = this.columnModel.getVisibleColAfter(lastColumn);
+                    // if already on right, go to next row and frist cell if possible
+                    if (!colToRight) {
+                        if (lastRowIndex === this.lastVirtualRenderedRow) {
+                            return null;
+                        }
+                        lastRowIndex = lastRowIndex + 1;
+                        colToRight = this.columnModel.getFristVisibleCol();
+                    }
+                    nextRowToFocus = lastRowIndex;
+                    nextColumnToFocus = colToRight;
+                    break;
                 case Constants.KEY_LEFT :
                     var colToLeft = this.columnModel.getVisibleColBefore(lastColumn);
                     // if already on left, do nothing

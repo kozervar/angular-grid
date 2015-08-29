@@ -23,6 +23,10 @@ module awk.grid {
         static KEY_UP = 38;
         static KEY_LEFT = 37;
         static KEY_RIGHT = 39;
+
+        static KEY_F2 = 113;
+        static KEY_END = 35;
+        static KEY_HOME = 36;
     }
 
 /*

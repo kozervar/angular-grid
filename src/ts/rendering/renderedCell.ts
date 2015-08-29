@@ -465,13 +465,13 @@ module awk.grid {
                 var key = event.which || event.keyCode;
 
                 var startNavigation = key === Constants.KEY_DOWN || key === Constants.KEY_UP
-                    || key === Constants.KEY_LEFT || key === Constants.KEY_RIGHT;
+                    || key === Constants.KEY_LEFT || key === Constants.KEY_RIGHT || key === Constants.KEY_TAB;
                 if (startNavigation) {
                     event.preventDefault();
                     that.rowRenderer.navigateToNextCell(key, that.rowIndex, that.column);
                 }
 
-                var startEdit = key === Constants.KEY_ENTER;
+                var startEdit = key === Constants.KEY_ENTER || key === Constants.KEY_F2;
                 if (startEdit && that.isCellEditable()) {
                     that.startEditing();
                     // if we don't prevent default, then the editor that get displayed also picks up the 'enter key'
