@@ -28,7 +28,6 @@ module awk.grid {
         private virtualRowCallbacks = <any>{};
         private gridOptions: GridOptions;
         private gridOptionsWrapper: GridOptionsWrapper;
-        private quickFilter: string;
         private inMemoryRowController: InMemoryRowController;
         private doingVirtualPaging: boolean;
         private paginationController: PaginationController;
@@ -60,9 +59,9 @@ module awk.grid {
             this.gridOptions.api = new GridApi(this, this.rowRenderer, this.headerRenderer, this.filterManager,
                 this.columnController, this.inMemoryRowController, this.selectionController,
                 this.gridOptionsWrapper, this.gridPanel, this.valueService, this.masterSlaveService);
+            this.gridOptions.columnApi = this.columnController.getColumnApi();
 
             var that = this;
-            this.quickFilter = null;
 
             // if using angular, watch for quickFilter changes
             if ($scope) {
@@ -76,12 +75,12 @@ module awk.grid {
                 window.addEventListener('resize', this.doLayout.bind(this));
             }
 
-            this.inMemoryRowController.setAllRows(this.gridOptionsWrapper.getAllRows());
+            this.inMemoryRowController.setAllRows(this.gridOptionsWrapper.getRowData());
             this.setupColumns();
             this.updateModelAndRefresh(Constants.STEP_EVERYTHING);
 
             // if no data provided initially, and not doing infinite scrolling, show the loading panel
-            var showLoading = !this.gridOptionsWrapper.getAllRows() && !this.gridOptionsWrapper.isVirtualPaging();
+            var showLoading = !this.gridOptionsWrapper.getRowData() && !this.gridOptionsWrapper.isVirtualPaging();
             this.showLoadingPanel(showLoading);
 
             // if datasource provided, use it
@@ -195,7 +194,7 @@ module awk.grid {
             this.masterSlaveService = masterSlaveService;
 
             this.eRootPanel = new BorderLayout({
-                center: gridPanel.layout,
+                center: gridPanel.getLayout(),
                 east: toolPanelLayout,
                 south: paginationGui,
                 dontFill: forPrint,
@@ -224,6 +223,8 @@ module awk.grid {
                 } else {
                     this.refreshHeaderAndBody();
                 }
+
+                this.gridPanel.showPinnedColContainersIfNeeded();
             });
         }
 
@@ -308,28 +309,9 @@ module awk.grid {
             this.finished = true;
         }
 
-        public getQuickFilter() {
-            return this.quickFilter;
-        }
-
         public onQuickFilterChanged(newFilter: any) {
-            if (newFilter === undefined || newFilter === "") {
-                newFilter = null;
-            }
-            if (this.quickFilter !== newFilter) {
-                if (this.gridOptionsWrapper.isVirtualPaging()) {
-                    console.warn('ag-grid: cannot do quick filtering when doing virtual paging');
-                    return;
-                }
-
-                //want 'null' to mean to filter, so remove undefined and empty string
-                if (newFilter === undefined || newFilter === "") {
-                    newFilter = null;
-                }
-                if (newFilter !== null) {
-                    newFilter = newFilter.toUpperCase();
-                }
-                this.quickFilter = newFilter;
+            var actuallyChanged = this.filterManager.setQuickFilter(newFilter);
+            if (actuallyChanged) {
                 this.onFilterChanged();
             }
         }
@@ -344,6 +326,7 @@ module awk.grid {
             if (typeof this.gridOptionsWrapper.getBeforeFilterChanged() === 'function') {
                 this.gridOptionsWrapper.getBeforeFilterChanged()();
             }
+            this.filterManager.onFilterChanged();
             this.headerRenderer.updateFilterIcons();
             if (this.gridOptionsWrapper.isEnableServerSideFilter()) {
                 // if doing server side filtering, changing the sort has the impact
@@ -373,6 +356,11 @@ module awk.grid {
             // we do not allow selecting groups by clicking (as the click here expands the group)
             // so return if it's a group row
             if (node.group) {
+                return;
+            }
+
+            // we also don't allow selection of floating rows
+            if (node.floating) {
                 return;
             }
 
@@ -410,8 +398,7 @@ module awk.grid {
         }
 
         private setupColumns() {
-            this.gridPanel.setHeaderHeight();
-            this.columnController.setColumns(this.gridOptionsWrapper.getColumnDefs());
+            this.columnController.onColumnsChanged();
             this.gridPanel.showPinnedColContainersIfNeeded();
         }
 
@@ -428,7 +415,7 @@ module awk.grid {
             if (rows) {
                 this.gridOptions.rowData = rows;
             }
-            this.inMemoryRowController.setAllRows(this.gridOptionsWrapper.getAllRows(), firstId);
+            this.inMemoryRowController.setAllRows(this.gridOptionsWrapper.getRowData(), firstId);
             this.selectionController.deselectAll();
             this.filterManager.onNewRowsLoaded();
             this.updateModelAndRefresh(Constants.STEP_EVERYTHING);
@@ -494,7 +481,7 @@ module awk.grid {
             var result = <any>[];
             for (i = 0; i < columnsWithSorting.length; i++) {
                 var resultEntry = {
-                    field: columnsWithSorting[i].colDef.field,
+                    colId: columnsWithSorting[i].colId,
                     sort: columnsWithSorting[i].sort
                 };
                 result.push(resultEntry);
@@ -519,9 +506,9 @@ module awk.grid {
                 if (sortModelProvided && !column.colDef.suppressSorting) {
                     for (var j = 0; j < sortModel.length; j++) {
                         var sortModelEntry = sortModel[j];
-                        if (typeof sortModelEntry.field === 'string'
-                            && typeof column.colDef.field === 'string'
-                            && sortModelEntry.field === column.colDef.field) {
+                        if (typeof sortModelEntry.colId === 'string'
+                            && typeof column.colId === 'string'
+                            && sortModelEntry.colId === column.colId) {
                             sortForCol = sortModelEntry.sort;
                             sortedAt = j;
                         }
@@ -613,7 +600,6 @@ module awk.grid {
             // both of the two below should be done in gridPanel, the gridPanel should register 'resize' to the panel
             if (sizeChanged) {
                 this.rowRenderer.drawVirtualRows();
-                this.gridPanel.setPinnedColHeight();
             }
         }
     }

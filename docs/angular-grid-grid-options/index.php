@@ -45,6 +45,14 @@ include '../documentation_header.php';
             <td>Data to be displayed as rows in the table</td>
         </tr>
         <tr>
+            <th>floatingTopRowData</th>
+            <td>Data to be displayed as floating top rows in the table</td>
+        </tr>
+        <tr>
+            <th>floatingBottomRowData</th>
+            <td>Data to be displayed as floating bottom rows in the table</td>
+        </tr>
+        <tr>
             <th>rowSelection</th>
             <td>Type of row selection, set to either 'single' or 'multiple' to enable selection.</td>
         </tr>
@@ -92,6 +100,14 @@ include '../documentation_header.php';
         <tr>
             <th>quickFilterText</th>
             <td>Rows are filtered using this text as a 'quick filter'.</td>
+        </tr>
+        <tr>
+            <th>isExternalFilterPresent()</th>
+            <td>Grid calls this method to know if external filter is present.</td>
+        </tr>
+        <tr>
+            <th>doesExternalFilterPass(node)</th>
+            <td>Return true if external filter passes, otherwise false.</td>
         </tr>
         <tr>
             <th>rowClass</th>
@@ -163,18 +179,6 @@ include '../documentation_header.php';
             <th>filterModified()<br/>beforeFilterChanged()<br/>afterFilterChanged()</th>
             <td>Callbacks that get called when the filtering changes. 'before' method gets called before the grid executes the filter. 'after' method
                 gets called after the grid executes the filter. filterModified is useful when using the Apply button.</td>
-        </tr>
-        <tr>
-            <th>columnResized</th>
-            <td>Function callback, gets called when a column has finished being resized by dragging its handle.</td>
-        </tr>
-        <tr>
-            <th>columnVisibilityChanged</th>
-            <td>Function callback, gets called when a column has its visibility toggled from the tools panel.</td>
-        </tr>
-        <tr>
-            <th>columnOrderChanged</th>
-            <td>Function callback, gets called when a column is re-ordered by changing its position from the tools panel.</td>
         </tr>
         <tr>
             <th>ready</th>

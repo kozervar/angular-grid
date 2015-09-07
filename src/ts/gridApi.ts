@@ -16,7 +16,8 @@ module awk.grid {
                     private gridOptionsWrapper: GridOptionsWrapper,
                     private gridPanel: GridPanel,
                     private valueService: ValueService,
-                    private masterSlaveService: MasterSlaveService) {}
+                    private masterSlaveService: MasterSlaveService) {
+        }
 
         /** Used internally by grid. Not intended to be used by the client. Interface may change between releases. */
         public __getMasterSlaveService(): MasterSlaveService {
@@ -37,6 +38,18 @@ module awk.grid {
 
         public onNewRows() {
             this.grid.setRows();
+        }
+
+        public setFloatingTopRowData(rows: any[]): void {
+            this.gridOptionsWrapper.setFloatingTopRowData(rows);
+            this.gridPanel.onBodyHeightChange();
+            this.refreshView();
+        }
+
+        public setFloatingBottomRowData(rows: any[]): void {
+            this.gridOptionsWrapper.setFloatingBottomRowData(rows);
+            this.gridPanel.onBodyHeightChange();
+            this.refreshView();
         }
 
         public onNewCols() {
@@ -152,6 +165,10 @@ module awk.grid {
             return this.selectionController.getBestCostNodeSelection();
         }
 
+        public getRenderedNodes() {
+            return this.rowRenderer.getRenderedNodes();
+        }
+
         public ensureColIndexVisible(index:any) {
             this.gridPanel.ensureColIndexVisible(index);
         }
@@ -215,6 +232,18 @@ module awk.grid {
             this.grid.setFocusedCell(rowIndex, colIndex);
         }
 
+        public setHeaderHeight(headerHeight: number) {
+            this.gridOptionsWrapper.setHeaderHeight(headerHeight);
+            this.gridPanel.onBodyHeightChange();
+        }
+
+        public setGroupHeaders(groupHeaders: boolean) {
+            this.gridOptionsWrapper.setGroupHeaders(groupHeaders);
+            this.columnController.onColumnsChanged();
+            // if using the default height, then this is impacted by the header count
+            this.gridPanel.onBodyHeightChange();
+        }
+
         public showToolPanel(show:any) {
             this.grid.showToolPanel(show);
         }
@@ -224,18 +253,22 @@ module awk.grid {
         }
 
         public hideColumn(colId:any, hide:any) {
+            console.warn('ag-Grid: hideColumn deprecated - use hideColumn on columnApi instead eg api.columnApi.hideColumn()');
             this.columnController.hideColumns([colId], hide);
         }
 
         public hideColumns(colIds:any, hide:any) {
+            console.warn('ag-Grid: hideColumns deprecated - use hideColumns on columnApi instead eg api.columnApi.hideColumns()');
             this.columnController.hideColumns(colIds, hide);
         }
 
         public getColumnState() {
+            console.warn('ag-Grid: getColumnState deprecated - use getColumnState on columnApi instead eg api.columnApi.getState()');
             return this.columnController.getState();
         }
 
         public setColumnState(state:any) {
+            console.warn('ag-Grid: setColumnState deprecated - use setColumnState on columnApi instead eg api.columnApi.setState()');
             this.columnController.setState(state);
         }
 
@@ -247,8 +280,5 @@ module awk.grid {
             return this.valueService.getValue(colDef, data, node);
         }
 
-        public getColumnController(): ColumnController {
-            return this.columnController;
-        }
     }
 }

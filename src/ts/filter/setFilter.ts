@@ -28,7 +28,7 @@ module awk.grid {
                 '</div>'+
             '</div>'+
             '<div class="ag-filter-apply-panel" id="applyPanel">'+
-                '<button type="button" id="applyButton">Apply Filter</button>' +
+                '<button type="button" id="applyButton">[APPLY FILTER]</button>' +
             '</div>'+
         '</div>';
 
@@ -57,11 +57,11 @@ module awk.grid {
         private applyActive: any;
         private eApplyButton: any;
 
-        constructor(params: any) {
+        public init(params: any): void {
             this.filterParams = params.filterParams;
             this.rowHeight = (this.filterParams && this.filterParams.cellHeight) ? this.filterParams.cellHeight : DEFAULT_ROW_HEIGHT;
             this.applyActive = this.filterParams && this.filterParams.apply == true;
-            this.model = new SetFilterModel(params.colDef, params.rowModel, params.valueGetter);
+            this.model = new SetFilterModel(params.colDef, params.rowModel, params.valueGetter, params.doesRowPassOtherFilter);
             this.filterChangedCallback = params.filterChangedCallback;
             this.filterModifiedCallback = params.filterModifiedCallback;
             this.valueGetter = params.valueGetter;
@@ -120,7 +120,13 @@ module awk.grid {
             var keepSelection = this.filterParams && this.filterParams.newRowsAction === 'keep';
             var isSelectAll = this.eSelectAll && this.eSelectAll.checked && !this.eSelectAll.indeterminate;
             // default is reset
-            this.model.refreshUniqueValues(keepSelection, isSelectAll);
+            this.model.refreshAfterNewRowsLoaded(keepSelection, isSelectAll);
+            this.setContainerHeight();
+            this.refreshVirtualRows();
+        }
+
+        public onAnyFilterChanged(): void {
+            this.model.refreshAfterAnyFilterChanged();
             this.setContainerHeight();
             this.refreshVirtualRows();
         }
@@ -128,7 +134,8 @@ module awk.grid {
         private createTemplate() {
             return template
                 .replace('[SELECT ALL]', this.localeTextFunc('selectAll', 'Select All'))
-                .replace('[SEARCH...]', this.localeTextFunc('searchOoo', 'Search...'));
+                .replace('[SEARCH...]', this.localeTextFunc('searchOoo', 'Search...'))
+                .replace('[APPLY FILTER]', this.localeTextFunc('applyFilter', 'Apply Filter'));
         }
 
         private createGui() {
@@ -263,7 +270,7 @@ module awk.grid {
             this.rowsInBodyContainer[rowIndex] = eFilterValue;
         }
 
-        onCheckboxClicked(eCheckbox: any, value: any) {
+        private onCheckboxClicked(eCheckbox: any, value: any) {
             var checked = eCheckbox.checked;
             if (checked) {
                 this.model.selectValue(value);

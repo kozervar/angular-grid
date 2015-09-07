@@ -18,7 +18,7 @@ module awk.grid {
                     '<input class="ag-filter-filter" id="filterText" type="text" placeholder="[FILTER...]"/>'+
                 '</div>'+
                 '<div class="ag-filter-apply-panel" id="applyPanel">'+
-                    '<button type="button" id="applyButton">Apply Filter</button>' +
+                    '<button type="button" id="applyButton">[APPLY FILTER]</button>' +
                 '</div>'+
             '</div>';
 
@@ -43,7 +43,7 @@ module awk.grid {
         private applyActive: any;
         private eApplyButton: any;
 
-        constructor(params: any) {
+        public init(params: any): void {
             this.filterParams = params.filterParams;
             this.applyActive = this.filterParams && this.filterParams.apply == true;
             this.filterChangedCallback = params.filterChangedCallback;
@@ -112,7 +112,8 @@ module awk.grid {
                 .replace('[FILTER...]', this.localeTextFunc('filterOoo', 'Filter...'))
                 .replace('[EQUALS]', this.localeTextFunc('equals', 'Equals'))
                 .replace('[LESS THAN]', this.localeTextFunc('lessThan', 'Less than'))
-                .replace('[GREATER THAN]', this.localeTextFunc('greaterThan', 'Greater than'));
+                .replace('[GREATER THAN]', this.localeTextFunc('greaterThan', 'Greater than'))
+                .replace('[APPLY FILTER]', this.localeTextFunc('applyFilter', 'Apply Filter'));
         }
 
         private createGui() {

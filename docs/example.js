@@ -47,6 +47,7 @@ gridsModule.controller('mainController', function($scope) {
 
     $scope.colCount = 20;
     $scope.rowCount = 100;
+    $scope.pinnedColumnCount = 0;
 
     $scope.size = 'fill'; // model for size select
     $scope.width = '100%'; // the div gets it's width and height from here
@@ -85,7 +86,7 @@ gridsModule.controller('mainController', function($scope) {
         //groupColumnDef: groupColumn,
         //suppressCellSelection: true,
         //suppressMultiSort: true,
-        showToolPanel: true,
+        showToolPanel: false,
         //toolPanelSuppressPivot: true,
         //toolPanelSuppressValues: true,
         //groupSuppressAutoColumn: true,
@@ -168,13 +169,14 @@ gridsModule.controller('mainController', function($scope) {
         firstColumn,
         {headerName: "Country", field: "country", headerGroup: 'Participant', width: 150, editable: true, cellRenderer: countryCellRenderer, filter: 'set',
             floatCell: true,
-            filterParams: {cellRenderer: countryCellRenderer, cellHeight: 20},
+            filterParams: {cellRenderer: countryCellRenderer, cellHeight: 20, newRowsAction: 'keep'},
             icons: {
                 sortAscending: '<i class="fa fa-sort-alpha-asc"/>',
                 sortDescending: '<i class="fa fa-sort-alpha-desc"/>'
             }
         },
         {headerName: "Language", field: "language", headerGroup: 'Participant', width: 150, editable: true, filter: 'set', cellRenderer: languageCellRenderer,
+            filterParams: {newRowsAction: 'keep'},
             icons: {
                 sortAscending: '<i class="fa fa-sort-alpha-asc"/>',
                 sortDescending: '<i class="fa fa-sort-alpha-desc"/>'
@@ -189,7 +191,7 @@ gridsModule.controller('mainController', function($scope) {
         {headerName: "Bought", field: "bought", filter: 'set', headerGroup: 'Game', editable: true, width: 100,
             cellRenderer: booleanCellRenderer, cellStyle: {"text-align": "center"}, comparator: booleanComparator,
             floatCell: true,
-            filterParams: {cellRenderer: booleanFilterCellRenderer}},
+            filterParams: {newRowsAction: 'keep', cellRenderer: booleanFilterCellRenderer}},
         {headerName: "Bank Balance", field: "bankBalance", headerGroup: 'Performance', width: 150, editable: true, filter: WinningsFilter, cellRenderer: currencyRenderer, cellStyle: currencyCssFunc,
             filterParams: {cellRenderer: currencyRenderer},
             aggFunc: 'sum',
@@ -254,7 +256,8 @@ gridsModule.controller('mainController', function($scope) {
     };
 
     $scope.onPinnedColCountChanged = function() {
-        angularGrid.api.onNewCols();
+        var newCount = Number($scope.pinnedColumnCount);
+        angularGrid.columnApi.setPinnedColumnCount(newCount);
     };
 
     $scope.onColCountChanged = function() {
@@ -304,8 +307,8 @@ gridsModule.controller('mainController', function($scope) {
     };
 
     $scope.onGroupHeaders = function() {
-        angularGrid.groupHeaders = $scope.groupHeaders === 'true';
-        angularGrid.api.onNewCols();
+        var groupHeaders = $scope.groupHeaders === 'true';
+        angularGrid.api.setGroupHeaders(groupHeaders);
     };
 
     $scope.onSize = function() {
@@ -316,6 +319,9 @@ gridsModule.controller('mainController', function($scope) {
             $scope.width = '800px';
             $scope.height = '600px';
         }
+        setTimeout( function() {
+            angularGrid.api.doLayout();
+        }, 0);
     };
 
     $scope.onGroupByChanged = function() {
@@ -446,13 +452,16 @@ function numberNewValueHandler(params) {
     data[field] = valueAsNumber;
 }
 
-function PersonFilter(params) {
+function PersonFilter() {
+}
+
+PersonFilter.prototype.init = function (params) {
     this.$scope = params.$scope;
     this.$scope.onFilterChanged = function() {
         params.filterChangedCallback();
     };
     this.valueGetter = params.valueGetter;
-}
+};
 
 PersonFilter.prototype.getGui = function () {
     return '<div style="padding: 4px; width: 200px;">' +
@@ -489,7 +498,11 @@ PersonFilter.prototype.isFilterActive = function () {
     return value !== null && value !== undefined && value !== '';
 };
 
-function WinningsFilter(params) {
+function WinningsFilter() {
+}
+
+WinningsFilter.prototype.init = function (params) {
+
     var uniqueId = Math.random();
     this.filterChangedCallback = params.filterChangedCallback;
     this.eGui = document.createElement("div");
@@ -514,7 +527,7 @@ function WinningsFilter(params) {
     this.cbGreater50.onclick = this.filterChangedCallback;
     this.cbGreater90.onclick = this.filterChangedCallback;
     this.valueGetter = params.valueGetter;
-}
+};
 
 WinningsFilter.prototype.getGui = function () {
     return this.eGui;

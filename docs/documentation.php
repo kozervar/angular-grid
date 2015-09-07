@@ -18,8 +18,12 @@ include 'documentation_header.php';
                 frameborder="0" scrolling="0" width="160px" height="30px">
         </iframe>
     </div>
-    <div style="text-align: center; font-weight: bold; font-size: 22px;">
-        Show your support, star Angular Grid on Github
+    <div style="text-align: center; font-size: 22px;">
+        Show your support, star
+            <span style="font-family: Impact, Charcoal, sans-serif; padding-left: 6px; padding-right: 6px;">
+                <span style="color: darkred;">ag</span><span style="color: #404040;">-Grid</span>
+            </span>
+        on Github
     </div>
 </div>
 
@@ -27,46 +31,49 @@ include 'documentation_header.php';
      xmlns="http://www.w3.org/1999/html">
 
     <p>
-        <b>9th Aug 2015</b>
+        <b>30th Aug 2015 <!--- Over 800 stars on Github and counting!!--></b>
     </p>
 
-    <p>
-        <b>Over 750 stars on GitHub, whoop whoop!!!</b>
-    </p>
+    <p>&nbsp;</p>
 
     <p>
         <b>Last Week</b>
     </p>
 
-    <p>
-        Last week was all about implementing the cool new feature <a href="/angular-grid-master-slave/index.php">
-        Master / Slave</a>. With this feature, you can implement grid footers. However it is much more powerful
-        than that, floating footers is just one usage of it. Check out it's documentation page.
-    </p>
+    <ul>
+
+        <li>
+            <b>Floating Headers and Footers:</b> Finally it's here!!! One of the most asked for features, floating
+            rows for the top and bottom of your grids!!! Read all about it
+            <a href="/angular-grid-floating/index.php">here</a>.
+        </li>
+
+    </ul>
 
     <p>
-        I also did a bunch of tweaks and fixes. Some of you will be aware of these as they follow chatter on
-        Github issues or the forum. If your really interested, check out the Github log.
+        And then the usual bug fixes as per Github and board chatter. If you want to see exactly, check out
+        Github history.
+    </p>
+    <p>
+        Release 1.15 contains the above.
     </p>
 
-    <p>
-        On other news, I'm getting very deep and dirty with Angular 2. I've researched all the web examples
-        I could find and am now reading through the source code. I'm pretty excited about it, Angular 2 is
-        much different to Angular 1. I'm hoping to have a fully working Angular 2 ag-Grid in the coming
-        weeks.
-    </p>
-
-    <p>
-        Release 1.13 contains all the above.
-    </p>
+    <p>&nbsp;</p>
 
     <p>
         <b>Next Week</b>
     </p>
     <p>
-        I'm going to continue with my Angular 2 and Web Components research. I am also going to have an
-        extended weekend break at <a href="http://www.greenman.net/">Greenman Festival</a>. So between
-        my research and my festival, I'm not going to get many new features implemented.
+        I'm going to continue with my Angular 2 and Web Components research. Oh - and I'm probably going to
+        implement a 'size grid to fit' soon - so the grid will size to the number of rows you have showing.
+    </p>
+
+    <p>
+        <b>Angular Air</b>
+    </p>
+    <p>
+        On Tuesday 15th September I will be on <a href="http://angular-air.com/">Angular Air</a> talking about
+        my work with ag-Grid.
     </p>
 
     <a href="https://twitter.com/angularGrid" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @angularGrid</a>
@@ -231,6 +238,18 @@ include 'documentation_header.php';
     <h3>
         News
     </h3>
+
+    <hr/>
+
+    <p>
+        <b>31th Aug</b> Column API, External Filtering, Excel Like Filtering
+    </p>
+
+    <hr/>
+
+    <p>
+        <b>16th Aug</b> Master & Slave Grids.
+    </p>
 
     <hr/>
 

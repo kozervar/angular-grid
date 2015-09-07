@@ -14,6 +14,39 @@ module awk.grid {
         (event: ColumnChangeEvent): void;
     }
 
+    export class ColumnApi {
+        constructor(private columnController: ColumnController) {}
+        public sizeColumnsToFit(gridWidth: any): void { this.columnController.sizeColumnsToFit(gridWidth); }
+        public hideColumns(colIds: any, hide: any): void { this.columnController.hideColumns(colIds, hide); }
+        public columnGroupOpened(group: ColumnGroup, newValue: boolean): void { this.columnController.columnGroupOpened(group, newValue); }
+        public getColumnGroup(name: string): ColumnGroup { return this.columnController.getColumnGroup(name); }
+        public addChangeListener(listener: ColumnChangedListener) { this.columnController.addChangeListener(listener); }
+        public getDisplayNameForCol(column: any): string { return this.columnController.getDisplayNameForCol(column); }
+        public getColumn(key: any): Column { return this.columnController.getColumn(key); }
+        public setState(columnState: any): void { return this.columnController.setState(columnState); }
+        public getState(): [any] { return this.columnController.getState(); }
+        public isPinning(): boolean { return this.columnController.isPinning(); }
+        public getVisibleColAfter(col: Column): Column { return this.columnController.getVisibleColAfter(col); }
+        public getVisibleColBefore(col: Column): Column { return this.columnController.getVisibleColBefore(col); }
+        public setColumnVisible(column: Column, visible: boolean): void { this.columnController.setColumnVisible(column, visible); }
+        public getAllColumns(): Column[] { return this.columnController.getAllColumns(); }
+        public getDisplayedColumns(): Column[] { return this.columnController.getDisplayedColumns(); }
+        public getPivotedColumns(): Column[] { return this.columnController.getPivotedColumns(); }
+        public getValueColumns(): Column[] { return this.columnController.getValueColumns(); }
+        public moveColumn(fromIndex: number, toIndex: number): void { this.columnController.moveColumn(fromIndex, toIndex); }
+        public movePivotColumn(fromIndex: number, toIndex: number): void { this.columnController.movePivotColumn(fromIndex, toIndex); }
+        public setColumnAggFunction(column: Column, aggFunc: string): void { this.columnController.setColumnAggFunction(column, aggFunc); }
+        public setColumnWidth(column: Column, newWidth: number): void { this.columnController.setColumnWidth(column, newWidth); }
+        public removeValueColumn(column: Column): void { this.columnController.removeValueColumn(column); }
+        public addValueColumn(column: Column): void { this.columnController.addValueColumn(column); }
+        public removePivotColumn(column: Column): void { this.columnController.removePivotColumn(column); }
+        public setPinnedColumnCount(count: number): void { this.columnController.setPinnedColumnCount(count); }
+        public addPivotColumn(column: Column): void { this.columnController.addPivotColumn(column); }
+        public getHeaderGroups(): ColumnGroup[] { return this.columnController.getHeaderGroups(); }
+
+        public hideColumn(colId: any, hide: any): void { this.columnController.hideColumns([colId], hide); }
+    }
+
     export class ColumnController {
 
         private gridOptionsWrapper: GridOptionsWrapper;
@@ -32,6 +65,7 @@ module awk.grid {
 
         private setupComplete = false;
         private valueService: ValueService;
+        private pinnedColumnCount: number;
 
         constructor() {
             this.changedListeners = [];
@@ -46,6 +80,16 @@ module awk.grid {
             this.expressionService = expressionService;
             this.valueService = valueService;
             this.masterSlaveController = masterSlaveController;
+
+            this.pinnedColumnCount = gridOptionsWrapper.getPinnedColCount();
+            // check for negative or non-number values
+            if (!(this.pinnedColumnCount>0)) {
+                this.pinnedColumnCount = 0;
+            }
+        }
+
+        public getColumnApi(): ColumnApi {
+            return new ColumnApi(this);
         }
 
         public isSetupComplete(): boolean {
@@ -78,6 +122,21 @@ module awk.grid {
             // columns may differ, so need to work out all the columns again
             this.updateModel();
             this.fireColumnChanged(new ColumnChangeEvent(ColumnChangeEvent.TYPE_PIVOT_CHANGE));
+        }
+
+        public setPinnedColumnCount(count: number): void {
+            if (!(typeof count === 'number')) {
+                console.warn('ag-Grid: setPinnedColumnCount: count must be a number');
+                return;
+            }
+            if (count < 0) {
+                console.warn('ag-Grid: setPinnedColumnCount: count must be zero or greater');
+                return;
+            }
+            this.pinnedColumnCount = count;
+            this.updateModel();
+            var event = new ColumnChangeEvent(ColumnChangeEvent.TYPE_PINNED_COUNT_CHANGED).withPinnedColumnCount(count);
+            this.fireColumnChanged(event);
         }
 
         public removePivotColumn(column: Column): void {
@@ -150,6 +209,7 @@ module awk.grid {
             }
 
             if (typeof this.gridOptionsWrapper.getColumnResized() === 'function') {
+                console.warn('ag-Grid: gridOptions.columnResized is deprecated - use the column API and events instead');
                 this.gridOptionsWrapper.getColumnResized()(column);
             }
 
@@ -165,7 +225,7 @@ module awk.grid {
             }
         }
 
-        public setColumnAggFunction(column: Column, aggFunc: string) {
+        public setColumnAggFunction(column: Column, aggFunc: string): void {
             column.aggFunc = aggFunc;
             this.fireColumnChanged(new ColumnChangeEvent(ColumnChangeEvent.TYPE_VALUE_CHANGE));
         }
@@ -187,6 +247,7 @@ module awk.grid {
                 .withToIndex(toIndex);
             this.fireColumnChanged(event);
             if (typeof this.gridOptionsWrapper.getColumnOrderChanged() === 'function') {
+                console.warn('ag-Grid: gridOptions.columnOrderChanged is deprecated, use the column API and events instead');
                 this.gridOptionsWrapper.getColumnOrderChanged()(this.allColumns);
             }
         }
@@ -204,7 +265,7 @@ module awk.grid {
         }
 
         // + toolPanel
-        public getGroupedColumns(): Column[] {
+        public getPivotedColumns(): Column[] {
             return this.pivotColumns;
         }
 
@@ -228,6 +289,7 @@ module awk.grid {
             this.fireColumnChanged(new ColumnChangeEvent(ColumnChangeEvent.TYPE_COLUMN_VISIBLE).withColumn(column));
 
             if (typeof this.gridOptionsWrapper.getColumnVisibilityChanged() === 'function') {
+                console.warn('agGrid: gridOptions.columnVisibilityChanged is deprecated - use the column events instead');
                 this.gridOptionsWrapper.getColumnVisibilityChanged()(this.allColumns);
             }
         }
@@ -259,7 +321,7 @@ module awk.grid {
 
         // used by:
         // + rowRenderer -> for navigation
-        public getVisibleColAfter(col: any): Column {
+        public getVisibleColAfter(col: Column): Column {
             var oldIndex = this.visibleColumns.indexOf(col);
             if (oldIndex < (this.visibleColumns.length - 1)) {
                 return this.visibleColumns[oldIndex + 1];
@@ -272,9 +334,9 @@ module awk.grid {
             return this.visibleColumns && this.visibleColumns.length > 0 && this.visibleColumns[0].pinned;
         }
 
-        public getState() {
+        public getState(): [any] {
             if (!this.allColumns || this.allColumns.length < 0) {
-                return [];
+                return <any>[];
             }
             var result = <any>[];
             for (var i = 0; i < this.allColumns.length; i++) {
@@ -292,7 +354,7 @@ module awk.grid {
             return result;
         }
 
-        public setState(columnState: any) {
+        public setState(columnState: any): void {
             var oldColumnList = this.allColumns;
             this.allColumns = [];
             this.pivotColumns = [];
@@ -341,7 +403,7 @@ module awk.grid {
             this.fireColumnChanged(new ColumnChangeEvent(ColumnChangeEvent.TYPE_EVERYTHING));
         }
 
-        public getColumn(key: any) {
+        public getColumn(key: any): Column {
             if (!key) {return null;}
 
             // need both allColumns and visibleColumns, in case the
@@ -409,7 +471,7 @@ module awk.grid {
             }
         }
 
-        public fireColumnChanged(event: ColumnChangeEvent): void {
+        private fireColumnChanged(event: ColumnChangeEvent): void {
             for (var i = 0; i < this.changedListeners.length; i++) {
                 this.changedListeners[i](event);
             }
@@ -417,7 +479,8 @@ module awk.grid {
         }
 
         // called by angularGrid
-        public setColumns(columnDefs: any) {
+        public onColumnsChanged() {
+            var columnDefs = this.gridOptionsWrapper.getColumnDefs();
             this.checkForDeprecatedItems(columnDefs);
             this.createColumns(columnDefs);
             this.createPivotColumns();
@@ -500,7 +563,7 @@ module awk.grid {
         }
 
         // called from api
-        public sizeColumnsToFit(gridWidth: any) {
+        public sizeColumnsToFit(gridWidth: any): void {
             // avoid divide by zero
             if (gridWidth <= 0 || this.displayedColumns.length === 0) {
                 return;
@@ -668,9 +731,8 @@ module awk.grid {
         }
 
         private updatePinnedColumns(): void {
-            var pinnedColumnCount = this.gridOptionsWrapper.getPinnedColCount();
             for (var i = 0; i < this.visibleColumns.length; i++) {
-                var pinned = i < pinnedColumnCount;
+                var pinned = i < this.pinnedColumnCount;
                 this.visibleColumns[i].pinned = pinned;
             }
         }
